@@ -32,10 +32,10 @@ ${workerFunctions.join("\n")}
             // Generate output type based on output variables
             let outputType =
               workflow.outputVariables.length > 0
-                ? `OutputVarsResponse<{
+                ? `{
     ${workflow.outputVariables.map((v) => `${v}: string`).join(";\n    ")}
-  }>`
-                : "StringResponse";
+  }`
+                : "string | undefined";
 
             return `\n  ${workflow.toString()}: WorkflowFunction<${inputType}, ${outputType}>;`;
           })

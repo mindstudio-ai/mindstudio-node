@@ -77,10 +77,3 @@ export type WorkflowFunction<
 > = TInput extends void
   ? (() => Promise<WorkflowResponse<TOutput>>) & { __info?: any }
   : ((input: TInput) => Promise<WorkflowResponse<TOutput>>) & { __info?: any };
-
-// Type for workflows with output variables
-export type OutputVarsResponse<T extends Record<string, string>> =
-  WorkflowResponse<T>;
-
-// Type for workflows without output variables
-export type StringResponse = WorkflowResponse<string | undefined>;
