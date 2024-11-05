@@ -79,15 +79,15 @@ After initialization, you'll get full TypeScript support for your workflows:
 
 ```typescript
 // Types are automatically generated based on your workflows
-const result = await client.workers.contentGenerator.createBlogPost({
+const { result } = await client.workers.contentGenerator.createBlogPost({
   topic: "AI Technology",
   tone: "Professional",
   wordCount: "1000"
 });
 
 // Result types are also fully typed
-console.log(result.result.blogPost);
-console.log(result.result.title);
+console.log(result.blogPost);
+console.log(result.title);
 ```
 
 ## Error Handling
