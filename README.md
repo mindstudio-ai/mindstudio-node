@@ -78,25 +78,66 @@ Regenerate TypeScript definitions from your current configuration.
 After initialization, you'll get full TypeScript support for your workflows:
 
 ```typescript
-// Types are automatically generated based on your workflows
-const { result } = await client.workers.contentGenerator.createBlogPost({
+// Workflow with output variables
+const { success, result, error, billingCost } = await client.workers.contentGenerator.createBlogPost({
   topic: "AI Technology",
   tone: "Professional",
   wordCount: "1000"
 });
 
-// Result types are also fully typed
-console.log(result.blogPost);
-console.log(result.title);
+if (success) {
+  // Result contains defined output variables
+  console.log(result.blogPost);
+  console.log(result.title);
+}
+
+// Workflow with string output
+const { success, result } = await client.workers.textGenerator.generateText({
+  prompt: "Write a story about a space cat"
+});
+
+if (success && typeof result === 'string') {
+  console.log(result); // Direct string output
+}
 ```
+
+## Response Structure
+
+All workflow executions return a consistent structure:
+
+```typescript
+interface WorkflowResponse<T> {
+  success: boolean;        // Indicates if the workflow executed successfully
+  result: T;              // Output variables object, string, or undefined
+  error?: any;            // Error information if the workflow failed
+  billingCost?: number;   // Execution cost for billing purposes
+}
+```
+
+The `result` type depends on your workflow configuration:
+
+- If output variables are defined: Returns an object with typed output variables
+- If no output variables: Returns a string or undefined
 
 ## Error Handling
 
 ```typescript
 try {
-  const result = await client.workers.myWorker.generateText({
+  const { success, result, error } = await client.workers.myWorker.generateText({
     prompt: "Hello"
   });
+
+  if (!success) {
+    console.error('Workflow failed:', error);
+    return;
+  }
+
+  // Handle the result based on its type
+  if (typeof result === 'string') {
+    console.log('Text generated:', result);
+  } else if (result && typeof result === 'object') {
+    console.log('Output variables:', result);
+  }
 } catch (error) {
   if (error instanceof MindStudioError) {
     console.error(error.code);    // Error code

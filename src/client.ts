@@ -3,29 +3,13 @@ import { MindStudioError } from "./errors";
 import {
   MSVariables,
   MSWorker,
-  MSWorkflow,
-  MSWorkflowExecutionResult,
+  MindStudioConfig,
   Worker,
   Workflow,
+  MSWorkflow,
 } from "./types";
 import { InputValidator } from "./validators";
-
-export interface MindStudioConfig {
-  baseUrl?: string;
-}
-
-export type WorkflowFunction<
-  TInput extends MSVariables = MSVariables,
-  TOutput extends MSWorkflowExecutionResult = MSWorkflowExecutionResult,
-> = ((input: TInput) => Promise<{ result: TOutput }>) & { __info?: any };
-
-export interface WorkerClient {
-  [workflowName: string]: WorkflowFunction;
-}
-
-export interface MindStudioWorkers {
-  [workerName: string]: WorkerClient;
-}
+import { MindStudioWorkers } from "./generated";
 
 export class MindStudio {
   public workers: MindStudioWorkers = {};
@@ -52,7 +36,6 @@ export class MindStudio {
   async init(): Promise<void> {
     try {
       const workers = await this.fetchWorkers();
-      console.log("Fetched workers", workers);
       await this.createWorkerMethods(workers);
     } catch (error) {
       throw new MindStudioError(
@@ -103,7 +86,7 @@ export class MindStudio {
       const workerName = worker.toString();
 
       if (!(workerName in this.workers)) {
-        (this.workers as Record<string, WorkerClient>)[workerName] = {};
+        this.workers[workerName] = {};
       }
 
       for (const workflow of worker.workflows) {
@@ -122,22 +105,35 @@ export class MindStudio {
             variables: input,
           });
 
-          const result = response.data.result;
+          const apiResult = response.data.result;
+          const billingCost = response.data.billingCost;
+          const error = response.data.error;
 
-          // Validate output if workflow has defined variables
+          // Determine result based on output variables
           if (workflow.outputVariables?.length) {
-            this.validator.validateOutput(result, workflow.outputVariables);
+            // Validate output if workflow has defined variables
+            this.validator.validateOutput(apiResult, workflow.outputVariables);
+            return {
+              success: true,
+              result: apiResult as Record<string, string>,
+              error,
+              billingCost,
+            };
+          } else {
+            // For workflows without output variables, result is string or undefined
+            return {
+              success: true,
+              result: typeof apiResult === "string" ? apiResult : undefined,
+              error,
+              billingCost,
+            };
           }
-
-          return { result };
         };
 
         workflowFn.__info = { ...workflow, worker };
 
-        // Assign the workflow function directly
-        (this.workers as Record<string, WorkerClient>)[workerName][
-          workflowName
-        ] = workflowFn;
+        // Assign the workflow function
+        this.workers[workerName][workflowName] = workflowFn;
       }
     }
   }

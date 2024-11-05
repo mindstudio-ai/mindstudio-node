@@ -58,6 +58,21 @@ export interface MSVariables {
   [key: string]: string;
 }
 
-export interface MSWorkflowExecutionResult {
-  result: Record<string, string>;
+// Shared response type for all workflow executions
+export interface WorkflowResponse<TResult> {
+  success: boolean;
+  result: TResult;
+  error?: any;
+  billingCost?: number;
 }
+
+// Base configuration type
+export interface MindStudioConfig {
+  baseUrl?: string;
+}
+
+// Base function type for workflows
+export type WorkflowFunction<
+  TInput extends MSVariables = MSVariables,
+  TOutput = Record<string, string> | string | undefined,
+> = ((input: TInput) => Promise<WorkflowResponse<TOutput>>) & { __info?: any };

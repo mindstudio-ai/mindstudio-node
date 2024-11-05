@@ -1,5 +1,5 @@
 import { Command } from "commander";
-import { MindStudio, WorkerClient } from "../client";
+import { MindStudio } from "../client";
 import { TypeGenerator } from "../codegen";
 import { ConfigManager } from "./config";
 import { Prompts } from "./prompts";
@@ -144,9 +144,7 @@ export class CLI {
         ? JSON.parse(options.input)
         : await this.prompts.getWorkflowInput(config, worker, workflow);
 
-      const result = await (client.workers as Record<string, WorkerClient>)[
-        worker
-      ][workflow](input);
+      const result = await client.workers[worker][workflow](input);
       console.log("Result:", JSON.stringify(result, null, 2));
     } catch (error) {
       console.error("Test failed:", error);

@@ -1,7 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
 import { MSWorker, Worker, Workflow } from "../types";
-import { MindStudio, WorkerClient } from "../client";
+import { MindStudio } from "../client";
 
 export interface Config {
   version: string;
@@ -29,23 +29,23 @@ export class ConfigManager {
       // Try development path first
       const devTypesDir = path.join(__dirname, "../../dist");
       await fs.mkdir(devTypesDir, { recursive: true });
-      await fs.writeFile(path.join(devTypesDir, "client.d.ts"), types);
+      await fs.writeFile(path.join(devTypesDir, "generated.d.ts"), types);
     } catch (error) {
       try {
         // Fall back to installed package path
         const packageDir = path.dirname(
           require.resolve("mindstudio/package.json")
         );
-        const clientDtsPath = path.join(packageDir, "dist", "client.d.ts");
-        await fs.writeFile(clientDtsPath, types);
+        const typesPath = path.join(packageDir, "dist", "generated.d.ts");
+        await fs.writeFile(typesPath, types);
       } catch (secondError) {
         // Final fallback to local node_modules
-        const localClientPath = path.join(
+        const localPath = path.join(
           process.cwd(),
-          "node_modules/mindstudio/dist/client.d.ts"
+          "node_modules/mindstudio/dist/generated.d.ts"
         );
-        await fs.mkdir(path.dirname(localClientPath), { recursive: true });
-        await fs.writeFile(localClientPath, types);
+        await fs.mkdir(path.dirname(localPath), { recursive: true });
+        await fs.writeFile(localPath, types);
       }
     }
   }
@@ -66,10 +66,8 @@ export class ConfigManager {
   }
 
   generateConfig(client: MindStudio): Config {
-    const workers = Object.entries(
-      client.workers as Record<string, WorkerClient>
-    ).map(([workerStub, worker]) => {
-      const workflows = Object.entries(worker).map(([_, workflowFn]) => {
+    const workers = Object.values(client.workers).map((worker) => {
+      const workflows = Object.values(worker).map((workflowFn) => {
         const info = workflowFn.__info;
         return {
           id: info.id,
@@ -80,9 +78,9 @@ export class ConfigManager {
         };
       });
 
-      // Get the first workflow's worker info since it's the same for all workflows
-      const firstWorkflow = Object.values(worker)[0];
-      const workerInfo = firstWorkflow.__info.worker;
+      // Get the worker info from any workflow function
+      const firstWorkflowFn = Object.values(worker)[0];
+      const workerInfo = firstWorkflowFn.__info.worker;
 
       return {
         id: workerInfo.id,

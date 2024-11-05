@@ -3,40 +3,23 @@ import { MSWorker } from "./types";
 export class TypeGenerator {
   generateTypes(workers: MSWorker[]): string {
     return `
-import { AxiosInstance } from "axios";
-import { MSVariables, MSWorkflowExecutionResult } from "./types";
+import { 
+  WorkflowResponse,
+  WorkflowFunction,
+} from "./types";
 
-export interface MindStudioConfig {
-  baseUrl?: string;
-}
+// Type for workflows with output variables
+export type OutputVarsResponse<T extends Record<string, string>> = WorkflowResponse<T>;
 
-export type WorkflowFunction<TInput extends MSVariables = MSVariables, TOutput extends MSWorkflowExecutionResult = MSWorkflowExecutionResult> = 
-  ((input: TInput) => Promise<{ result: TOutput }>) & { __info?: any };
-
-export interface WorkerClient {
-  [workflowName: string]: WorkflowFunction;
-}
+// Type for workflows without output variables
+export type StringResponse = WorkflowResponse<string | undefined>;
 
 ${this.generateWorkerInterfaces(workers)}
 
 export interface MindStudioWorkers {
   ${workers.map((w) => `${w.toString()}: ${this.getWorkerInterfaceName(w.toString())};`).join("\n  ")}
 }
-
-export class MindStudio {
-  public workers: MindStudioWorkers;
-  private readonly http: AxiosInstance;
-
-  constructor(apiKey: string, config?: MindStudioConfig);
-  init(): Promise<void>;
-}
-
-export default MindStudio;
 `.trim();
-  }
-
-  private getWorkerInterfaceName(slug: string): string {
-    return `${slug}Worker`;
   }
 
   private generateWorkerInterfaces(workers: MSWorker[]): string {
@@ -47,19 +30,37 @@ export default MindStudio;
         return `
 export interface ${interfaceName} {
   ${worker.workflows
-    .map(
-      (workflow) => `
-  ${workflow.toString()}(input: {
-    ${workflow.launchVariables.map((v) => `${v}: string;`).join("\n    ")}
-  }): Promise<{
-    result: {
-      ${workflow.outputVariables.map((v) => `${v}: string;`).join("\n      ")}
-    };
-  }>;`
-    )
+    .map((workflow) => {
+      const launchVars = workflow.launchVariables
+        .map((v) => `${v}: string;`)
+        .join("\n    ");
+
+      // Generate input type
+      const inputType = `{ ${launchVars} }`;
+
+      // Generate output type based on output variables
+      let outputType: string;
+      if (workflow.outputVariables.length > 0) {
+        const outputVars = workflow.outputVariables
+          .map((v) => `${v}: string;`)
+          .join("\n      ");
+        outputType = `OutputVarsResponse<{
+      ${outputVars}
+    }>`;
+      } else {
+        outputType = "StringResponse";
+      }
+
+      return `
+  ${workflow.toString()}: WorkflowFunction<${inputType}, ${outputType}>;`;
+    })
     .join("\n")}
 }`;
       })
       .join("\n\n");
+  }
+
+  private getWorkerInterfaceName(slug: string): string {
+    return `${slug}Worker`;
   }
 }
