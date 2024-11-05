@@ -1,6 +1,6 @@
 # MindStudio
 
-JavaScript/TypeScript client library for MindStudio Serverless AI Functions. Easily integrate and execute AI workflows in your applications with type-safe interfaces.
+Client library for MindStudio AI Workers. Easily integrate and execute AI workflows in your applications with type-safe interfaces.
 
 ## Installation
 

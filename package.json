@@ -1,7 +1,7 @@
 {
   "name": "mindstudio",
   "version": "0.1.1",
-  "description": "JavaScript client library for MindStudio Serverless AI Functions",
+  "description": "Client library for MindStudio AI Workers",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
