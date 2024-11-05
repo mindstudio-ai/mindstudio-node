@@ -62,7 +62,6 @@ export interface MSVariables {
 export interface WorkflowResponse<TResult> {
   success: boolean;
   result: TResult;
-  error?: any;
   billingCost?: number;
 }
 
@@ -73,6 +72,15 @@ export interface MindStudioConfig {
 
 // Base function type for workflows
 export type WorkflowFunction<
-  TInput extends MSVariables = MSVariables,
+  TInput extends MSVariables | void = MSVariables,
   TOutput = Record<string, string> | string | undefined,
-> = ((input: TInput) => Promise<WorkflowResponse<TOutput>>) & { __info?: any };
+> = TInput extends void
+  ? (() => Promise<WorkflowResponse<TOutput>>) & { __info?: any }
+  : ((input: TInput) => Promise<WorkflowResponse<TOutput>>) & { __info?: any };
+
+// Type for workflows with output variables
+export type OutputVarsResponse<T extends Record<string, string>> =
+  WorkflowResponse<T>;
+
+// Type for workflows without output variables
+export type StringResponse = WorkflowResponse<string | undefined>;

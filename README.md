@@ -18,11 +18,13 @@ const client = new MindStudio('your-api-key');
 await client.init();
 
 // Execute a workflow
-const result = await client.workers.myWorker.generateText({
+const { success, result } = await client.workers.myWorker.generateText({
   prompt: "Write a story about a space cat"
 });
 
-console.log(result);
+if (success) {
+  console.log(result);
+}
 ```
 
 ## Configuration
@@ -31,6 +33,7 @@ Create a `.env` file in your project root:
 
 ```env
 MINDSTUDIO_KEY=your-api-key
+MINDSTUDIO_BASE_URL=https://custom-api-endpoint.com  # Optional
 ```
 
 Or pass configuration when initializing:
@@ -41,11 +44,63 @@ const client = new MindStudio('your-api-key', {
 });
 ```
 
+## Type Definitions
+
+The library provides comprehensive TypeScript definitions. After initialization, you'll get full type support for your workflows:
+
+```typescript
+// Import available types
+import { 
+  WorkflowResponse, 
+  OutputVarsResponse, 
+  StringResponse,
+  MindStudioWorkers 
+} from 'mindstudio';
+
+// Type-safe worker instance
+const client: MindStudio;
+const workers: MindStudioWorkers;
+
+// Workflow with output variables
+const response: OutputVarsResponse<{
+  blogPost: string;
+  title: string;
+}> = await client.workers.contentGenerator.createBlogPost({
+  topic: "AI Technology",
+  tone: "Professional"
+});
+
+// Workflow with string output
+const response: StringResponse = await client.workers.textGenerator.generateText({
+  prompt: "Write a story"
+});
+```
+
+## Response Types
+
+All workflow executions return a consistent structure:
+
+```typescript
+// Base response type
+interface WorkflowResponse<TResult> {
+  success: boolean;
+  result: TResult;
+  error?: any;
+  billingCost?: number;
+}
+
+// For workflows with output variables
+type OutputVarsResponse<T extends Record<string, string>> = WorkflowResponse<T>;
+
+// For workflows with string output
+type StringResponse = WorkflowResponse<string | undefined>;
+```
+
 ## CLI Usage
 
-MindStudio includes a CLI for workspace management and type generation.
+MindStudio includes a CLI for workspace management:
 
-### Initialize Your Workspace
+### Initialize Workspace
 
 ```bash
 npx mindstudio sync
@@ -53,75 +108,31 @@ npx mindstudio sync
 
 This will:
 
-1. Create a `.mindstudio.json` configuration file
-2. Generate TypeScript type definitions for your workers
+1. Create `.mindstudio.json` with your worker configurations
+2. Generate TypeScript definitions in `node_modules/mindstudio/dist/generated.d.ts`
 3. Set up your development environment
 
 ### Test Workflows
 
 ```bash
-npx mindstudio test
+npx mindstudio test [--worker <name>] [--workflow <name>] [--input <json>]
 ```
 
-Interactive CLI to test your workflows with input validation.
+Interactive CLI to test workflows with input validation.
 
-### Generate Types
+### Regenerate Types
 
 ```bash
 npx mindstudio generate
 ```
 
-Regenerate TypeScript definitions from your current configuration.
-
-## Type-Safe Workflows
-
-After initialization, you'll get full TypeScript support for your workflows:
-
-```typescript
-// Workflow with output variables
-const { success, result, error, billingCost } = await client.workers.contentGenerator.createBlogPost({
-  topic: "AI Technology",
-  tone: "Professional",
-  wordCount: "1000"
-});
-
-if (success) {
-  // Result contains defined output variables
-  console.log(result.blogPost);
-  console.log(result.title);
-}
-
-// Workflow with string output
-const { success, result } = await client.workers.textGenerator.generateText({
-  prompt: "Write a story about a space cat"
-});
-
-if (success && typeof result === 'string') {
-  console.log(result); // Direct string output
-}
-```
-
-## Response Structure
-
-All workflow executions return a consistent structure:
-
-```typescript
-interface WorkflowResponse<T> {
-  success: boolean;        // Indicates if the workflow executed successfully
-  result: T;              // Output variables object, string, or undefined
-  error?: any;            // Error information if the workflow failed
-  billingCost?: number;   // Execution cost for billing purposes
-}
-```
-
-The `result` type depends on your workflow configuration:
-
-- If output variables are defined: Returns an object with typed output variables
-- If no output variables: Returns a string or undefined
+Updates TypeScript definitions from your current `.mindstudio.json` configuration.
 
 ## Error Handling
 
 ```typescript
+import { MindStudioError } from 'mindstudio';
+
 try {
   const { success, result, error } = await client.workers.myWorker.generateText({
     prompt: "Hello"
@@ -131,19 +142,14 @@ try {
     console.error('Workflow failed:', error);
     return;
   }
-
-  // Handle the result based on its type
-  if (typeof result === 'string') {
-    console.log('Text generated:', result);
-  } else if (result && typeof result === 'object') {
-    console.log('Output variables:', result);
-  }
 } catch (error) {
   if (error instanceof MindStudioError) {
-    console.error(error.code);    // Error code
-    console.error(error.status);  // HTTP status
-    console.error(error.message); // Error message
-    console.error(error.details); // Additional error details
+    console.error({
+      code: error.code,      // Error code string
+      status: error.status,  // HTTP status code
+      message: error.message,// Error description
+      details: error.details // Additional context
+    });
   }
 }
 ```
@@ -152,15 +158,15 @@ try {
 
 ### Version Control
 
-We recommend committing your `.mindstudio.json` file to version control. This ensures:
+Commit `.mindstudio.json` to version control to ensure:
 
-- Consistent worker/workflow configurations across your team
+- Consistent worker configurations across your team
 - Type definitions can be regenerated on new installations
-- Changes to your AI workflows can be tracked over time
+- AI workflow changes can be tracked
 
 ### Post-Install Type Generation
 
-To ensure type definitions are always up-to-date after package installation, add a postinstall script to your `package.json`:
+Add to your `package.json`:
 
 ```json
 {
@@ -170,13 +176,13 @@ To ensure type definitions are always up-to-date after package installation, add
 }
 ```
 
-This will automatically regenerate type definitions when:
+This regenerates types automatically when:
 
-- Installing the project on a new machine
-- Running `npm install` or `yarn install`
+- Installing on a new machine
+- Running `npm install`
 - Updating the mindstudio package
 
-Note: Make sure `.mindstudio.json` exists in your repository for this to work.
+Note: Requires `.mindstudio.json` in your repository.
 
 ## License
 

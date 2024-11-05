@@ -2,24 +2,18 @@ import { MSWorker } from "./types";
 
 export class TypeGenerator {
   generateTypes(workers: MSWorker[]): string {
-    return `
-import { 
-  WorkflowResponse,
-  WorkflowFunction,
-} from "./types";
+    const workerInterfaces = this.generateWorkerInterfaces(workers);
+    const workerFunctions = workers.map(
+      (w) => `  ${w.toString()}: ${this.getWorkerInterfaceName(w.toString())};`
+    );
 
-// Type for workflows with output variables
-export type OutputVarsResponse<T extends Record<string, string>> = WorkflowResponse<T>;
+    return `import { OutputVarsResponse, StringResponse, WorkflowFunction } from "./types";
 
-// Type for workflows without output variables
-export type StringResponse = WorkflowResponse<string | undefined>;
-
-${this.generateWorkerInterfaces(workers)}
+${workerInterfaces}
 
 export interface MindStudioWorkers {
-  ${workers.map((w) => `${w.toString()}: ${this.getWorkerInterfaceName(w.toString())};`).join("\n  ")}
-}
-`.trim();
+${workerFunctions.join("\n")}
+}`.trim();
   }
 
   private generateWorkerInterfaces(workers: MSWorker[]): string {
@@ -27,35 +21,25 @@ export interface MindStudioWorkers {
       .map((worker) => {
         const interfaceName = this.getWorkerInterfaceName(worker.toString());
 
-        return `
-export interface ${interfaceName} {
-  ${worker.workflows
-    .map((workflow) => {
-      const launchVars = workflow.launchVariables
-        .map((v) => `${v}: string;`)
-        .join("\n    ");
+        return `export interface ${interfaceName} {${worker.workflows
+          .map((workflow) => {
+            // Generate input type based on launch variables
+            let inputType =
+              workflow.launchVariables.length > 0
+                ? `{ ${workflow.launchVariables.map((v) => `${v}: string`).join("; ")} }`
+                : "void";
 
-      // Generate input type
-      const inputType = `{ ${launchVars} }`;
+            // Generate output type based on output variables
+            let outputType =
+              workflow.outputVariables.length > 0
+                ? `OutputVarsResponse<{
+    ${workflow.outputVariables.map((v) => `${v}: string`).join(";\n    ")}
+  }>`
+                : "StringResponse";
 
-      // Generate output type based on output variables
-      let outputType: string;
-      if (workflow.outputVariables.length > 0) {
-        const outputVars = workflow.outputVariables
-          .map((v) => `${v}: string;`)
-          .join("\n      ");
-        outputType = `OutputVarsResponse<{
-      ${outputVars}
-    }>`;
-      } else {
-        outputType = "StringResponse";
-      }
-
-      return `
-  ${workflow.toString()}: WorkflowFunction<${inputType}, ${outputType}>;`;
-    })
-    .join("\n")}
-}`;
+            return `\n  ${workflow.toString()}: WorkflowFunction<${inputType}, ${outputType}>;`;
+          })
+          .join("")}\n}`;
       })
       .join("\n\n");
   }

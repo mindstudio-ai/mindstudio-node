@@ -93,21 +93,27 @@ export class MindStudio {
         const workflowName = workflow.toString();
 
         // Create the workflow function
-        const workflowFn = async (input: MSVariables) => {
+        const workflowFn = async (input?: MSVariables) => {
           // Validate input if workflow has defined variables
           if (workflow.launchVariables?.length) {
+            if (!input) {
+              throw new MindStudioError(
+                "Input variables are required for this workflow",
+                "missing_input",
+                400
+              );
+            }
             this.validator.validateInput(input, workflow.launchVariables);
           }
 
           const response = await this.http.post("/workers/run", {
             workerId: worker.id,
             workflowId: workflow.id,
-            variables: input,
+            variables: input || {},
           });
 
           const apiResult = response.data.result;
           const billingCost = response.data.billingCost;
-          const error = response.data.error;
 
           // Determine result based on output variables
           if (workflow.outputVariables?.length) {
@@ -116,7 +122,6 @@ export class MindStudio {
             return {
               success: true,
               result: apiResult as Record<string, string>,
-              error,
               billingCost,
             };
           } else {
@@ -124,7 +129,6 @@ export class MindStudio {
             return {
               success: true,
               result: typeof apiResult === "string" ? apiResult : undefined,
-              error,
               billingCost,
             };
           }
