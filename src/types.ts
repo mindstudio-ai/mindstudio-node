@@ -61,8 +61,9 @@ export interface MSVariables {
 // Shared response type for all workflow executions
 export interface WorkflowResponse<TResult> {
   success: boolean;
-  result: TResult;
-  billingCost?: number;
+  result?: TResult;
+  error?: Error;
+  billingCost?: string;
 }
 
 // Base configuration type

@@ -130,29 +130,55 @@ Updates TypeScript definitions from your current `.mindstudio.json` configuratio
 
 ## Error Handling
 
+The library provides two levels of error handling:
+
+1. Workflow execution errors (returned in the response)
+2. Client-level errors (thrown as MindStudioError)
+
+### Workflow Execution Errors
+
+```typescript
+const { success, result, error } = await client.workers.myWorker.generateText({
+  prompt: "Hello"
+});
+
+if (!success) {
+  console.error('Workflow execution failed:', error);
+  return;
+}
+
+console.log('Success:', result);
+```
+
+### Client-Level Errors
+
 ```typescript
 import { MindStudioError } from 'mindstudio';
 
 try {
-  const { success, result, error } = await client.workers.myWorker.generateText({
-    prompt: "Hello"
-  });
-
-  if (!success) {
-    console.error('Workflow failed:', error);
-    return;
-  }
+  // These can throw MindStudioError:
+  const client = new MindStudio('invalid-api-key');
+  await client.init();
+  
 } catch (error) {
   if (error instanceof MindStudioError) {
     console.error({
-      code: error.code,      // Error code string
-      status: error.status,  // HTTP status code
-      message: error.message,// Error description
-      details: error.details // Additional context
+      message: error.message,  // Error description
+      code: error.code,        // Error code (e.g., 'missing_api_key', 'init_failed')
+      status: error.status,    // HTTP status code (e.g., 400, 500)
+      details: error.details   // Additional error context
     });
   }
 }
 ```
+
+Common error codes:
+
+- `missing_api_key`: API key not provided
+- `init_failed`: Failed to initialize client
+- `missing_input`: Required workflow input variables not provided
+- `invalid_input`: Input validation failed
+- `invalid_output`: Output validation failed
 
 ## Best Practices
 

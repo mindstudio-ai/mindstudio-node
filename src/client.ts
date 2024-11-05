@@ -106,30 +106,40 @@ export class MindStudio {
             this.validator.validateInput(input, workflow.launchVariables);
           }
 
-          const response = await this.http.post("/workers/run", {
-            workerId: worker.id,
-            workflowId: workflow.id,
-            variables: input || {},
-          });
+          try {
+            const response = await this.http.post("/workers/run", {
+              workerId: worker.id,
+              workflowId: workflow.id,
+              variables: input || {},
+            });
 
-          const apiResult = response.data.result;
-          const billingCost = response.data.billingCost;
+            const apiResult = response.data.result;
+            const billingCost = response.data.billingCost;
 
-          // Determine result based on output variables
-          if (workflow.outputVariables?.length) {
-            // Validate output if workflow has defined variables
-            this.validator.validateOutput(apiResult, workflow.outputVariables);
+            // Determine result based on output variables
+            if (workflow.outputVariables?.length) {
+              // Validate output if workflow has defined variables
+              this.validator.validateOutput(
+                apiResult,
+                workflow.outputVariables
+              );
+              return {
+                success: true,
+                result: apiResult as Record<string, string>,
+                billingCost,
+              };
+            } else {
+              // For workflows without output variables, result is string or undefined
+              return {
+                success: true,
+                result: typeof apiResult === "string" ? apiResult : undefined,
+                billingCost,
+              };
+            }
+          } catch (error) {
             return {
-              success: true,
-              result: apiResult as Record<string, string>,
-              billingCost,
-            };
-          } else {
-            // For workflows without output variables, result is string or undefined
-            return {
-              success: true,
-              result: typeof apiResult === "string" ? apiResult : undefined,
-              billingCost,
+              success: false,
+              error: error as Error,
             };
           }
         };
