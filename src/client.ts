@@ -131,7 +131,7 @@ export class MindStudio {
           try {
             const response = await this.http.post("/workers/run", {
               workerId: worker.id,
-              workflowId: workflow.id,
+              workflow: workflow.name,
               variables: input || {},
             });
 
