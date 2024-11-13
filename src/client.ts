@@ -154,7 +154,10 @@ export class MindStudio {
               // For workflows without output variables, result is string or undefined
               return {
                 success: true,
-                result: typeof apiResult === "string" ? apiResult : undefined,
+                result:
+                  typeof apiResult === "string"
+                    ? apiResult
+                    : JSON.stringify(apiResult),
                 billingCost,
               };
             }
