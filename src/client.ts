@@ -34,32 +34,34 @@ export class MindStudio {
   }
 
   async init(): Promise<void> {
+    // First try to load from local config
+    try {
+      const { ConfigManager } = require("./cli/config");
+      const configManager = new ConfigManager();
+
+      if (await configManager.exists()) {
+        const config = await configManager.load();
+        const workers = configManager.convertToWorkerWorkflows(config);
+        await this.createWorkerMethods(workers);
+
+        // Kick off API fetch in background to update to latest
+        this.fetchWorkers()
+          .then((workers) => this.createWorkerMethods(workers))
+          .catch(() => {
+            // Silently fail background update - we're already initialized from config
+          });
+
+        return;
+      }
+    } catch (configError) {
+      // Config load failed, fall back to API
+    }
+
+    // If no config exists or loading failed, initialize from API
     try {
       const workers = await this.fetchWorkers();
       await this.createWorkerMethods(workers);
     } catch (error) {
-      // Try to load from local config file
-      try {
-        const { ConfigManager } = require("./cli/config");
-        const configManager = new ConfigManager();
-
-        if (await configManager.exists()) {
-          const config = await configManager.load();
-          const workers = configManager.convertToWorkerWorkflows(config);
-          await this.createWorkerMethods(workers);
-          return;
-        }
-      } catch (configError) {
-        // If both API and config file fail, throw the original error
-        throw new MindStudioError(
-          "Failed to initialize MindStudio client",
-          "init_failed",
-          500,
-          error
-        );
-      }
-
-      // If config file doesn't exist, throw the original error
       throw new MindStudioError(
         "Failed to initialize MindStudio client",
         "init_failed",
