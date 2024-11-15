@@ -7,7 +7,7 @@ export class TypeGenerator {
       (w) => `  ${w.toString()}: ${this.getWorkerInterfaceName(w.toString())};`
     );
 
-    return `import { OutputVarsResponse, StringResponse, WorkflowFunction } from "./types";
+    return `import { WorkflowFunction } from "./types";
 
 ${workerInterfaces}
 
