@@ -33,13 +33,13 @@ export class MindStudio {
     });
   }
 
-  async init(): Promise<void> {
+  async init(forceRefresh = false): Promise<void> {
     // First try to load from local config
     try {
       const { ConfigManager } = require("./cli/config");
       const configManager = new ConfigManager();
 
-      if (await configManager.exists()) {
+      if ((await configManager.exists()) && !forceRefresh) {
         const config = await configManager.load();
         const workers = configManager.convertToWorkerWorkflows(config);
         await this.createWorkerMethods(workers);

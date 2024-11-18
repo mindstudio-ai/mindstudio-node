@@ -74,7 +74,7 @@ export class CLI {
       const client = new MindStudio(apiKey, {
         baseUrl: options.baseUrl,
       });
-      await client.init();
+      await client.init(true);
 
       if (isInit) {
         console.log("Generating configuration...");
