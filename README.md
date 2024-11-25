@@ -1,6 +1,7 @@
 ![MindStudio](https://youai.imgix.net/images/a47f3f3a-a1fa-41ca-8de3-e415452b4611_1731014311207.png?fm=auto)
 
 # MindStudio JavaScript/TypeScript API Library
+
 ![NPM Version](https://img.shields.io/npm/v/mindstudio)
 
 Client library for MindStudio AI Workers. Easily integrate and execute AI workflows in your applications with type-safe interfaces.
@@ -9,6 +10,7 @@ Client library for MindStudio AI Workers. Easily integrate and execute AI workfl
 
 ```bash
 npm install mindstudio
+npx mindstudio sync
 ```
 
 ## Quick Start
