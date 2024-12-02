@@ -7,17 +7,17 @@ interface FormattableEntity {
 export class EntityFormatter {
   static formatWorker(worker: FormattableEntity): string {
     if (worker.slug) {
-      return this.formatEntity(worker.slug);
+      return this.formatEntity(worker.slug, 'pascalCase');
     }
-    const name = this.formatEntity(worker.name);
+    const name = this.formatEntity(worker.name, 'pascalCase');
     return `${name}_${worker.id?.split("-")[0]}`;
   }
 
   static formatWorkflow(workflow: FormattableEntity): string {
-    return this.formatEntity(workflow.name);
+    return this.formatEntity(workflow.name, 'camelCase');
   }
 
-  private static formatEntity(name: string): string {
+  private static formatEntity(name: string, caseStyle: 'camelCase'|'pascalCase'): string {
     // Preserve leading underscores
     const leadingUnderscores = name.match(/^_+/)?.[0] || "";
 
@@ -38,7 +38,7 @@ export class EntityFormatter {
       leadingUnderscores +
       words
         .map((word, index) =>
-          index === 0
+          (index === 0 && caseStyle === 'camelCase')
             ? word.toLowerCase()
             : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
         )

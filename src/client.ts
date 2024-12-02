@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from "axios";
+import { version } from '../package.json';
 import { MindStudioError } from "./errors";
 import {
   MSVariables,
@@ -29,6 +30,7 @@ export class MindStudio {
       headers: {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
+        'User-Agent': `MindStudio-NPM/v${version}`,
       },
     });
   }
