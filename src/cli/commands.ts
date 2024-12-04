@@ -64,6 +64,13 @@ export class CLI {
       const options = this.getConfig(cmdOptions);
       const apiKey = await this.prompts.getApiKey(options.apiKey);
 
+      if (!apiKey) {
+        console.error(
+          "No API key provided. Set MINDSTUDIO_KEY in your environment or .env file"
+        );
+        return;
+      }
+
       if (isInit) {
         console.log("Fetching worker configurations...");
       }
@@ -93,7 +100,7 @@ export class CLI {
       );
     } catch (error) {
       console.error(isInit ? "Initialization failed:" : "Sync failed:", error);
-      process.exit(1);
+      console.error("This will not affect your application runtime.");
     }
   }
 
