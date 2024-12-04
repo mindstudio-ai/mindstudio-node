@@ -10,46 +10,43 @@ interface CommandOptions {
 }
 
 export class CLI {
-  private program: Command;
-  private config: ConfigManager;
-  private prompts: Prompts;
-  private typeGenerator: TypeGenerator;
+  constructor(
+    private program: Command = new Command(),
+    private config: ConfigManager = new ConfigManager(),
+    private typeGenerator: TypeGenerator = new TypeGenerator(),
+    private prompts: Prompts = new Prompts()
+  ) {
+    if (!this.program.commands.length) {
+      this.program.name("mindstudio").description("MindStudio CLI");
 
-  constructor() {
-    this.program = new Command();
-    this.config = new ConfigManager();
-    this.prompts = new Prompts();
-    this.typeGenerator = new TypeGenerator();
-    this.setupCommands();
-  }
+      if (!this.program.opts().version) {
+        this.program.version(require("../../package.json").version);
+      }
 
-  private setupCommands(): void {
-    this.program
-      .name("mindstudio")
-      .description("MindStudio CLI")
-      .version(require("../../package.json").version)
-      .option("--base-url <url>", "Override API base URL")
-      .option("--key <apiKey>", "Override API key");
+      this.program
+        .option("--base-url <url>", "Override API base URL")
+        .option("--key <apiKey>", "Override API key");
 
-    this.program
-      .command("sync")
-      .description("Initialize or sync MindStudio configuration")
-      .option("--key <apiKey>", "MindStudio API key")
-      .option("--base-url <url>", "API base URL")
-      .action(this.handleSync.bind(this));
+      this.program
+        .command("sync")
+        .description("Initialize or sync MindStudio configuration")
+        .option("--key <apiKey>", "MindStudio API key")
+        .option("--base-url <url>", "API base URL")
+        .action(this.handleSync.bind(this));
 
-    this.program
-      .command("generate")
-      .description("Generate type definitions from existing configuration")
-      .action(this.handleGenerate.bind(this));
+      this.program
+        .command("generate")
+        .description("Generate type definitions from existing configuration")
+        .action(this.handleGenerate.bind(this));
 
-    this.program
-      .command("test")
-      .description("Test a workflow")
-      .option("--worker <worker>", "Worker name")
-      .option("--workflow <workflow>", "Workflow name")
-      .option("--input <input>", "Input JSON string")
-      .action(this.handleTest.bind(this));
+      this.program
+        .command("test")
+        .description("Test a workflow")
+        .option("--worker <worker>", "Worker name")
+        .option("--workflow <workflow>", "Workflow name")
+        .option("--input <input>", "Input JSON string")
+        .action(this.handleTest.bind(this));
+    }
   }
 
   private getConfig(options: CommandOptions) {
@@ -103,7 +100,8 @@ export class CLI {
   private async handleGenerate(): Promise<void> {
     try {
       if (!(await this.config.exists())) {
-        throw new Error('No configuration found. Run "mindstudio sync" first.');
+        console.error('No configuration found. Run "mindstudio sync" first.');
+        return;
       }
 
       const config = await this.config.load();
@@ -117,7 +115,6 @@ export class CLI {
       console.log("Successfully generated type definitions");
     } catch (error) {
       console.error("Generation failed:", error);
-      process.exit(1);
     }
   }
 
