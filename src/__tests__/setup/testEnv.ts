@@ -10,9 +10,9 @@ if (result.error) {
   console.warn("Failed to load test environment variables:", result.error);
 }
 
-// Verify API key is set
+// Set default test API key if not provided
 if (!process.env.MINDSTUDIO_KEY) {
-  console.warn("MINDSTUDIO_KEY is not set in test environment");
+  process.env.MINDSTUDIO_KEY = "test-api-key-123";
 }
 
 // Global test timeout

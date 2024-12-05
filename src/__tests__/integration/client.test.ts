@@ -1,6 +1,6 @@
 import { MindStudio } from "../../client";
 import { ApiMock } from "../setup/apiMock";
-import { mockWorkerData } from "../__mocks__/workerData";
+import { ConfigManager } from "../../cli/config";
 
 describe("MindStudio Client Integration", () => {
   const apiMock = new ApiMock();
@@ -10,44 +10,127 @@ describe("MindStudio Client Integration", () => {
     apiMock.reset();
   });
 
-  it("should initialize and execute workflow", async () => {
-    // Mock the initial worker load with properly formatted names
-    apiMock.mockWorkerLoad([
-      {
-        id: "test-worker-id",
-        name: "Test Worker",
-      },
-    ]);
+  describe("Direct Execution", () => {
+    it("should execute workflow without type definitions", async () => {
+      apiMock.mockWorkflowExecution({
+        result: "Generated text",
+        billingCost: "0.01",
+      });
 
-    // Mock the workflow load
-    apiMock.mockWorkflowLoad("test-worker-id", [
-      {
-        id: "test-workflow-id",
-        name: "Generate Text",
-        launchVariables: ["prompt"],
-        outputVariables: [],
-      },
-    ]);
+      const client = new MindStudio(TEST_API_KEY);
+      const result = await client.run({
+        workerId: "test-worker-id",
+        workflow: "generateText",
+        variables: {
+          prompt: "Hello world",
+        },
+      });
 
-    // Mock the workflow execution
-    apiMock.mockWorkflowExecution({
-      result: "Generated text",
-      billingCost: "0.01",
+      expect(result).toEqual({
+        success: true,
+        result: "Generated text",
+        billingCost: "0.01",
+      });
     });
 
-    // Initialize client
-    const client = new MindStudio(TEST_API_KEY);
-    await client.init();
+    it("should handle execution errors gracefully", async () => {
+      apiMock.mockWorkflowExecutionError(new Error("Execution failed"));
 
-    // The client should now have a TestWorker.generateText method
-    const result = await client.workers.TestWorker_test.generateText({
-      prompt: "Hello world",
+      const client = new MindStudio(TEST_API_KEY);
+      const result = await client.run({
+        workerId: "test-worker-id",
+        workflow: "generateText",
+        variables: {
+          prompt: "Hello world",
+        },
+      });
+
+      expect(result).toEqual({
+        success: false,
+        error: expect.any(Error),
+      });
+    });
+  });
+
+  describe("Type-Safe Execution", () => {
+    let configManager: ConfigManager;
+
+    beforeEach(() => {
+      configManager = new ConfigManager();
+      configManager.write({
+        version: "1.0.0",
+        workers: [
+          {
+            id: "test-worker-id",
+            name: "Test Worker",
+            slug: "test-worker",
+            workflows: [
+              {
+                id: "test-workflow-id",
+                name: "Generate Text",
+                slug: "generateText",
+                launchVariables: ["prompt"],
+                outputVariables: [],
+              },
+            ],
+          },
+        ],
+      });
     });
 
-    expect(result).toEqual({
-      success: true,
-      result: "Generated text",
-      billingCost: "0.01",
+    it("should execute workflow with type definitions", async () => {
+      apiMock.mockWorkflowExecution({
+        result: "Generated text",
+        billingCost: "0.01",
+      });
+
+      const client = new MindStudio(TEST_API_KEY);
+
+      console.log(client.workers);
+      const result = await client.workers["test-worker"].generateText({
+        prompt: "Hello world",
+      });
+
+      expect(result).toEqual({
+        success: true,
+        result: "Generated text",
+        billingCost: "0.01",
+      });
+    });
+
+    it("should throw error when type definitions are not available", async () => {
+      configManager.clean();
+
+      const client = new MindStudio(TEST_API_KEY);
+
+      expect(() => client.workers).toThrow(
+        "Type-safe workers not available. Run 'npx mindstudio sync' first to generate types."
+      );
+    });
+  });
+
+  describe("Client Initialization", () => {
+    it("should throw error when API key is missing", () => {
+      expect(() => new MindStudio("")).toThrow("API key is required");
+    });
+
+    it("should accept custom base URL", async () => {
+      apiMock.mockWorkflowExecution({
+        result: "Generated text",
+        billingCost: "0.01",
+      });
+
+      const client = new MindStudio(TEST_API_KEY, {
+        baseUrl: "https://custom-api.mindstudio.ai",
+      });
+
+      const result = await client.run({
+        workerId: "test-worker-id",
+        workflow: "generateText",
+        variables: { prompt: "Hello" },
+      });
+
+      expect(result.success).toBe(true);
     });
   });
 });

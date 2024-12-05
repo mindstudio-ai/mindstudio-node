@@ -39,23 +39,5 @@
   "files": [
     "dist",
     "types"
-  ],
-  "jest": {
-    "preset": "ts-jest",
-    "testEnvironment": "node",
-    "testMatch": [
-      "<rootDir>/src/**/__tests__/**/*.test.ts"
-    ],
-    "moduleFileExtensions": [
-      "ts",
-      "js",
-      "json",
-      "node"
-    ],
-    "clearMocks": true,
-    "resetMocks": true,
-    "setupFilesAfterEnv": [
-      "<rootDir>/src/__tests__/setup/testEnv.ts"
-    ]
-  }
+  ]
 }

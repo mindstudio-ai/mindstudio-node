@@ -9,9 +9,11 @@ import {
   Workflow,
   MSWorkflow,
   WorkflowResponse,
+  WorkflowFunction,
 } from "./types";
 import { InputValidator } from "./validators";
 import { MindStudioWorkers } from "./generated";
+import { ConfigManager } from "./cli/config";
 
 export class MindStudio {
   private readonly http: AxiosInstance;
@@ -41,14 +43,42 @@ export class MindStudio {
 
   private loadWorkersFromConfig(): void {
     try {
-      const { ConfigManager } = require("./cli/config");
       const configManager = new ConfigManager();
-      const config = configManager.loadSync(); // Synchronous load for simplicity
-      this._workers = configManager.convertToWorkerWorkflows(config);
+      const config = configManager.load();
+      const workers = configManager.convertToWorkerWorkflows(config);
+
+      this._workers = workers.reduce((acc, worker) => {
+        // Create an object of workflow functions for each worker
+        acc[worker.slug] = worker.workflows.reduce(
+          (workflowAcc, workflow) => {
+            workflowAcc[workflow.slug] = async (variables?: MSVariables) => {
+              return this.run({
+                workerId: worker.id,
+                workflow: workflow.slug,
+                variables: variables || {},
+              });
+            };
+            // Add workflow metadata
+            (workflowAcc[workflow.slug] as any).__info = {
+              ...workflow,
+              worker: {
+                id: worker.id,
+                name: worker.name,
+                slug: worker.slug,
+              },
+            };
+            return workflowAcc;
+          },
+          {} as Record<string, WorkflowFunction>
+        );
+
+        return acc;
+      }, {} as MindStudioWorkers);
     } catch (error) {
       // If loading fails, _workers remains undefined
       console.warn(
-        "Type-safe workers not available. Run 'npx mindstudio sync' to generate types."
+        "Type-safe workers not available. Run 'npx mindstudio sync' to generate types.",
+        error
       );
     }
   }
