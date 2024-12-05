@@ -27,7 +27,6 @@ export class CLI {
       .option("--base-url <url>", "Override API base URL")
       .option("--key <apiKey>", "Override API key");
 
-    const generateCmd = new GenerateCommand(this.config, this.typeGenerator);
     const syncCmd = new SyncCommand(
       this.config,
       this.typeGenerator,
@@ -37,15 +36,10 @@ export class CLI {
 
     this.program
       .command("sync")
-      .description("Initialize or sync MindStudio configuration")
+      .description("Initialize or sync MindStudio configuration and types")
       .option("--key <apiKey>", "MindStudio API key")
       .option("--base-url <url>", "API base URL")
       .action((options) => syncCmd.execute(options));
-
-    this.program
-      .command("generate")
-      .description("Generate type definitions from existing configuration")
-      .action(() => generateCmd.execute());
 
     this.program
       .command("test")

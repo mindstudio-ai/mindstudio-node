@@ -6,11 +6,17 @@
 
 Client library for MindStudio AI Workers. Easily integrate and execute AI workflows in your applications with type-safe interfaces.
 
-## Installation
+## Installation & Setup
 
 ```bash
+# Install the package
 npm install mindstudio
+
+# First-time setup (requires API key)
 npx mindstudio sync
+
+# For team members with existing .mindstudio.json
+npx mindstudio sync --offline
 ```
 
 ## Quick Start
@@ -105,33 +111,51 @@ type StringResponse = WorkflowResponse<string | undefined>;
 
 MindStudio includes a CLI for workspace management:
 
-### Initialize Workspace
+### Sync Command
+
+The `sync` command handles both initialization and updates:
 
 ```bash
+# Full sync - fetches latest config and generates types
 npx mindstudio sync
+
+# Offline mode - generates types from existing .mindstudio.json
+npx mindstudio sync --offline
 ```
 
-This will:
+#### When to use each mode
 
-1. Create `.mindstudio.json` with your worker configurations
-2. Generate TypeScript definitions in `node_modules/mindstudio/dist/generated.d.ts`
-3. Set up your development environment
+- **Full Sync** (default):
+  - First-time setup
+  - When you create new workers
+  - When you update existing workers
+  - When you want to fetch the latest changes
 
-### Test Workflows
+- **Offline Mode** (`--offline`):
+  - After running `npm install`
+  - In CI/CD environments
+  - When you just need to regenerate types
+  - When you have `.mindstudio.json` and don't need updates
 
-```bash
-npx mindstudio test [--worker <name>] [--workflow <name>] [--input <json>]
+### Post-Install Setup
+
+Add to your `package.json`:
+
+```json
+{
+  "scripts": {
+    "postinstall": "mindstudio sync --offline"
+  }
+}
 ```
 
-Interactive CLI to test workflows with input validation.
+This regenerates types automatically after:
 
-### Regenerate Types
+- Installing on a new machine
+- Running `npm install`
+- Updating the mindstudio package
 
-```bash
-npx mindstudio generate
-```
-
-Updates TypeScript definitions from your current `.mindstudio.json` configuration.
+Note: Requires `.mindstudio.json` in your repository.
 
 ## Error Handling
 
