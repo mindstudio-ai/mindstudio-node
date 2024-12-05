@@ -19,23 +19,36 @@ npx mindstudio sync
 npx mindstudio sync --offline
 ```
 
-## Quick Start
+## Usage
+
+### Type-Safe Usage (Recommended)
 
 ```typescript
 import { MindStudio } from 'mindstudio';
 
-// Initialize the client
 const client = new MindStudio('your-api-key');
-await client.init();
 
-// Execute a workflow
+// Access type-safe workers (requires running 'npx mindstudio sync' first)
 const { success, result } = await client.workers.myWorker.generateText({
   prompt: "Write a story about a space cat"
 });
+```
 
-if (success) {
-  console.log(result);
-}
+### Direct Execution
+
+```typescript
+import { MindStudio } from 'mindstudio';
+
+const client = new MindStudio('your-api-key');
+
+// Direct worker execution (always available)
+const { success, result } = await client.run({
+  workerId: "worker-id",
+  workflow: "generateText",
+  variables: {
+    prompt: "Write a story about a space cat"
+  }
+});
 ```
 
 ## Configuration
@@ -219,26 +232,6 @@ Commit `.mindstudio.json` to version control to ensure:
 - Consistent worker configurations across your team
 - Type definitions can be regenerated on new installations
 - AI workflow changes can be tracked
-
-### Post-Install Type Generation
-
-Add to your `package.json`:
-
-```json
-{
-  "scripts": {
-    "postinstall": "mindstudio sync --offline"
-  }
-}
-```
-
-This regenerates types automatically when:
-
-- Installing on a new machine
-- Running `npm install`
-- Updating the mindstudio package
-
-Note: Requires `.mindstudio.json` in your repository.
 
 ## License
 

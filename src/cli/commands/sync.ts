@@ -60,17 +60,31 @@ export class SyncCommand {
       );
       console.log("📡 Fetching latest worker configurations...");
 
-      const client = new MindStudio(apiKey, { baseUrl: options.baseUrl });
-      await client.init(true);
+      const workers = await MindStudio.fetchWorkerDefinitions(
+        apiKey,
+        options.baseUrl
+      );
+      const config = {
+        version: "1.0.0",
+        workers: workers.map((w) => ({
+          id: w.id,
+          name: w.name,
+          slug: w.slug,
+          workflows: w.workflows.map((wf) => ({
+            id: wf.id,
+            name: wf.name,
+            slug: wf.slug,
+            launchVariables: wf.launchVariables,
+            outputVariables: wf.outputVariables,
+          })),
+        })),
+      };
 
-      const newConfig = this.config.generateConfig(client);
-      await this.config.write(newConfig);
+      await this.config.write(config);
       console.log("💾 Configuration saved to .mindstudio.json");
 
       console.log("📝 Generating type definitions...");
-      const types = this.typeGenerator.generateTypes(
-        this.config.convertToWorkerWorkflows(newConfig)
-      );
+      const types = this.typeGenerator.generateTypes(workers);
       await this.config.writeTypes(types);
 
       console.log(
