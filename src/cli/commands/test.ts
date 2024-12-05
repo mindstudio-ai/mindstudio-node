@@ -1,4 +1,4 @@
-import { MindStudio } from "../../client";
+import { MindStudio } from "../../client/client";
 import { ConfigManager } from "../config";
 import { Prompts } from "../prompts";
 
@@ -31,7 +31,6 @@ export class TestCommand {
       const client = new MindStudio(apiKey, {
         baseUrl: options.baseUrl,
       });
-      await client.init();
 
       const { worker, workflow } =
         options.worker && options.workflow

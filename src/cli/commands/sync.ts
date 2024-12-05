@@ -1,7 +1,8 @@
-import { MindStudio } from "../../client";
+import { MindStudio } from "../../client/client";
 import { TypeGenerator } from "../../codegen";
 import { ConfigManager } from "../config";
 import { Prompts } from "../prompts";
+import { WorkerDiscoveryService } from "../services/worker-discovery";
 
 interface SyncOptions {
   key?: string;
@@ -60,7 +61,7 @@ export class SyncCommand {
       );
       console.log("📡 Fetching latest worker configurations...");
 
-      const workers = await MindStudio.fetchWorkerDefinitions(
+      const workers = await WorkerDiscoveryService.fetchWorkerDefinitions(
         apiKey,
         options.baseUrl
       );

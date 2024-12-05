@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import path from "path";
 import { MSWorker, Worker, Workflow } from "../types";
-import { MindStudio } from "../client";
+import { MindStudio } from "../client/client";
 
 export interface Config {
   version: string;
@@ -69,6 +69,9 @@ export class ConfigManager {
     const workers = Object.values(client.workers).map((worker) => {
       const workflows = Object.values(worker).map((workflowFn) => {
         const info = workflowFn.__info;
+        if (!info) {
+          throw new Error("Workflow function missing metadata");
+        }
         return {
           id: info.id,
           name: info.name,
@@ -78,8 +81,10 @@ export class ConfigManager {
         };
       });
 
-      // Get the worker info from any workflow function
       const firstWorkflowFn = Object.values(worker)[0];
+      if (!firstWorkflowFn.__info?.worker) {
+        throw new Error("Worker function missing metadata");
+      }
       const workerInfo = firstWorkflowFn.__info.worker;
 
       return {
