@@ -1,7 +1,7 @@
-import { HttpClient } from "./http-client";
 import { MindStudioError } from "../errors";
-import { MSVariables, WorkflowResponse } from "../types";
 import { MindStudioWorkers } from "../generated";
+import { WorkflowResponse } from "../types";
+import { HttpClient } from "./http-client";
 import { HttpClientConfig, WorkflowExecutionResponse } from "./types";
 import { WorkerLoader } from "./worker-loader";
 
@@ -12,7 +12,7 @@ export class MindStudio {
 
   constructor(apiKey: string, config: HttpClientConfig = {}) {
     this.httpClient = new HttpClient(apiKey, config);
-    this.workerLoader = new WorkerLoader(this.run.bind(this.httpClient));
+    this.workerLoader = new WorkerLoader(this.run.bind(this));
     this._workers = this.workerLoader.loadFromConfig();
   }
 
