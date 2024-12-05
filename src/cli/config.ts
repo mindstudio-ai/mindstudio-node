@@ -1,4 +1,4 @@
-import fs from "fs/promises";
+import * as fs from "fs";
 import path from "path";
 import { MSWorker, Worker, Workflow } from "../types";
 import { MindStudio } from "../client";
@@ -20,16 +20,16 @@ export interface Config {
 }
 
 export class ConfigManager {
-  async write(config: Config): Promise<void> {
-    await fs.writeFile(".mindstudio.json", JSON.stringify(config, null, 2));
+  write(config: Config): void {
+    fs.writeFileSync(".mindstudio.json", JSON.stringify(config, null, 2));
   }
 
-  async writeTypes(types: string): Promise<void> {
+  writeTypes(types: string): void {
     try {
       // Try development path first
       const devTypesDir = path.join(__dirname, "../../dist");
-      await fs.mkdir(devTypesDir, { recursive: true });
-      await fs.writeFile(path.join(devTypesDir, "generated.d.ts"), types);
+      fs.mkdirSync(devTypesDir, { recursive: true });
+      fs.writeFileSync(path.join(devTypesDir, "generated.d.ts"), types);
     } catch (error) {
       try {
         // Fall back to installed package path
@@ -37,22 +37,22 @@ export class ConfigManager {
           require.resolve("mindstudio/package.json")
         );
         const typesPath = path.join(packageDir, "dist", "generated.d.ts");
-        await fs.writeFile(typesPath, types);
+        fs.writeFileSync(typesPath, types);
       } catch (secondError) {
         // Final fallback to local node_modules
         const localPath = path.join(
           process.cwd(),
           "node_modules/mindstudio/dist/generated.d.ts"
         );
-        await fs.mkdir(path.dirname(localPath), { recursive: true });
-        await fs.writeFile(localPath, types);
+        fs.mkdirSync(path.dirname(localPath), { recursive: true });
+        fs.writeFileSync(localPath, types);
       }
     }
   }
 
-  async load(): Promise<Config> {
+  load(): Config {
     try {
-      const configFile = await fs.readFile(".mindstudio.json", "utf-8");
+      const configFile = fs.readFileSync(".mindstudio.json", "utf-8");
       const config = JSON.parse(configFile);
 
       return {
@@ -118,12 +118,16 @@ export class ConfigManager {
     );
   }
 
-  async exists(): Promise<boolean> {
+  exists(): boolean {
     try {
-      await fs.access(".mindstudio.json");
+      fs.accessSync(".mindstudio.json");
       return true;
     } catch {
       return false;
     }
+  }
+
+  clean(): void {
+    fs.rmSync(".mindstudio.json", { force: true });
   }
 }

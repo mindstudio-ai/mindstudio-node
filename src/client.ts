@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from "axios";
-import { version } from '../package.json';
+import { version } from "../package.json";
 import { MindStudioError } from "./errors";
 import {
   MSVariables,
@@ -8,14 +8,17 @@ import {
   Worker,
   Workflow,
   MSWorkflow,
+  WorkflowResponse,
+  WorkflowFunction,
 } from "./types";
 import { InputValidator } from "./validators";
 import { MindStudioWorkers } from "./generated";
+import { ConfigManager } from "./cli/config";
 
 export class MindStudio {
-  public workers: MindStudioWorkers = {};
   private readonly http: AxiosInstance;
   private readonly validator: InputValidator;
+  private _workers?: MindStudioWorkers;
 
   constructor(apiKey: string, config: MindStudioConfig = {}) {
     if (!apiKey) {
@@ -30,61 +33,123 @@ export class MindStudio {
       headers: {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
-        'User-Agent': `MindStudio-NPM/v${version}`,
+        "User-Agent": `MindStudio-NPM/v${version}`,
       },
     });
+
+    // Attempt to load workers from the generated types
+    this.loadWorkersFromConfig();
   }
 
-  async init(forceRefresh = false): Promise<void> {
-    // First try to load from local config
+  private loadWorkersFromConfig(): void {
     try {
-      const { ConfigManager } = require("./cli/config");
       const configManager = new ConfigManager();
+      const config = configManager.load();
+      const workers = configManager.convertToWorkerWorkflows(config);
 
-      if ((await configManager.exists()) && !forceRefresh) {
-        const config = await configManager.load();
-        const workers = configManager.convertToWorkerWorkflows(config);
-        await this.createWorkerMethods(workers);
+      this._workers = workers.reduce((acc, worker) => {
+        // Create an object of workflow functions for each worker
+        acc[worker.slug] = worker.workflows.reduce(
+          (workflowAcc, workflow) => {
+            workflowAcc[workflow.slug] = async (variables?: MSVariables) => {
+              return this.run({
+                workerId: worker.id,
+                workflow: workflow.slug,
+                variables: variables || {},
+              });
+            };
+            // Add workflow metadata
+            (workflowAcc[workflow.slug] as any).__info = {
+              ...workflow,
+              worker: {
+                id: worker.id,
+                name: worker.name,
+                slug: worker.slug,
+              },
+            };
+            return workflowAcc;
+          },
+          {} as Record<string, WorkflowFunction>
+        );
 
-        // Kick off API fetch in background to update to latest
-        this.fetchWorkers()
-          .then((workers) => this.createWorkerMethods(workers))
-          .catch(() => {
-            // Silently fail background update - we're already initialized from config
-          });
-
-        return;
-      }
-    } catch (configError) {
-      // Config load failed, fall back to API
-    }
-
-    // If no config exists or loading failed, initialize from API
-    try {
-      const workers = await this.fetchWorkers();
-      await this.createWorkerMethods(workers);
+        return acc;
+      }, {} as MindStudioWorkers);
     } catch (error) {
-      throw new MindStudioError(
-        "Failed to initialize MindStudio client",
-        "init_failed",
-        500,
+      // If loading fails, _workers remains undefined
+      console.warn(
+        "Type-safe workers not available. Run 'npx mindstudio sync' to generate types.",
         error
       );
     }
   }
 
-  private async fetchWorkers(): Promise<MSWorker[]> {
-    const { data } = await this.http.get("/workers/load");
+  /**
+   * Type-safe worker access - only available if types are generated
+   */
+  public get workers(): MindStudioWorkers {
+    if (!this._workers) {
+      throw new MindStudioError(
+        "Type-safe workers not available. Run 'npx mindstudio sync' first to generate types.",
+        "types_not_generated",
+        400
+      );
+    }
+    return this._workers;
+  }
+
+  /**
+   * Direct worker execution without type safety
+   */
+  public async run(params: {
+    workerId: string;
+    workflow: string;
+    variables?: Record<string, string>;
+  }): Promise<WorkflowResponse<any>> {
+    try {
+      const response = await this.http.post("/workers/run", {
+        workerId: params.workerId,
+        workflow: params.workflow,
+        variables: params.variables || {},
+      });
+
+      return {
+        success: true,
+        result: response.data.result,
+        billingCost: response.data.billingCost,
+      };
+    } catch (error) {
+      if (error instanceof Error) {
+        return {
+          success: false,
+          error,
+        };
+      }
+      return {
+        success: false,
+        error: new Error(String(error)),
+      };
+    }
+  }
+
+  /**
+   * @internal Used by CLI for worker discovery
+   */
+  static async fetchWorkerDefinitions(
+    apiKey: string,
+    baseUrl?: string
+  ): Promise<MSWorker[]> {
+    const client = new MindStudio(apiKey, { baseUrl });
+    const { data } = await client.http.get("/workers/load");
     const workers = data.apps;
 
     return await Promise.all(
       workers.map(
         async (workerData: { id: string; name: string; slug: string }) => {
-          const { data: workflowData } = await this.http.get(
+          const { data: workflowData } = await client.http.get(
             `/workers/${workerData.id}/workflows`
           );
 
-          const worker = new Worker(
+          return new Worker(
             workerData.id,
             workerData.name,
             workerData.slug,
@@ -100,85 +165,9 @@ export class MindStudio {
                 )
             )
           );
-
-          return worker;
         }
       )
     );
-  }
-
-  private async createWorkerMethods(workers: MSWorker[]): Promise<void> {
-    for (const worker of workers) {
-      const workerName = worker.toString();
-
-      if (!(workerName in this.workers)) {
-        this.workers[workerName] = {};
-      }
-
-      for (const workflow of worker.workflows) {
-        const workflowName = workflow.toString();
-
-        // Create the workflow function
-        const workflowFn = async (input?: MSVariables) => {
-          // Validate input if workflow has defined variables
-          if (workflow.launchVariables?.length) {
-            if (!input) {
-              throw new MindStudioError(
-                "Input variables are required for this workflow",
-                "missing_input",
-                400
-              );
-            }
-            this.validator.validateInput(input, workflow.launchVariables);
-          }
-
-          try {
-            const response = await this.http.post("/workers/run", {
-              workerId: worker.id,
-              workflow: workflow.name,
-              variables: input || {},
-            });
-
-            const apiResult = response.data.result;
-            const billingCost = response.data.billingCost;
-
-            // Determine result based on output variables
-            if (workflow.outputVariables?.length) {
-              // Validate output if workflow has defined variables
-              this.validator.validateOutput(
-                apiResult,
-                workflow.outputVariables
-              );
-              return {
-                success: true,
-                result: apiResult as Record<string, string>,
-                billingCost,
-              };
-            } else {
-              // For workflows without output variables, result is string or undefined
-              return {
-                success: true,
-                result:
-                  typeof apiResult === "string"
-                    ? apiResult
-                    : JSON.stringify(apiResult),
-                billingCost,
-              };
-            }
-          } catch (error) {
-            return {
-              success: false,
-              error: error as Error,
-            };
-          }
-        };
-
-        workflowFn.__info = { ...workflow, worker };
-
-        // Assign the workflow function
-        this.workers[workerName][workflowName] = workflowFn;
-      }
-    }
   }
 }
 

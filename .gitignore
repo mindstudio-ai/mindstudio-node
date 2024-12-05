@@ -3,3 +3,4 @@ dist
 coverage
 .env
 .mindstudio.json
+dist/**/__tests__

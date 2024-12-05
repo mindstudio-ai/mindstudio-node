@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import dotenv from "dotenv";
-import { CLI } from "./commands";
+import { CLI } from "./cli";
 
 // Load environment variables from .env file
 dotenv.config();
