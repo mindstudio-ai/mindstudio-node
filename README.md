@@ -6,42 +6,91 @@
 
 Client library for MindStudio AI Workers. Easily integrate and execute AI workflows in your applications with type-safe interfaces.
 
-## Installation & Setup
+## Quick Start
+
+1. **Install the Package**
 
 ```bash
-# Install the package
 npm install mindstudio
-
-# First-time setup (requires API key)
-npx mindstudio sync
-
-# For team members with existing .mindstudio.json
-npx mindstudio sync --offline
 ```
 
-## Usage
+2. **Get Your API Key**
+   - Go to [MindStudio Developer Settings](https://app.mindstudio.ai/workspace/settings/developer?page=api-keys)
+   - Create a new API key
+   - Copy the key for the next step
 
-### Type-Safe Usage (Recommended)
+3. **Initialize Your Workspace**
+
+```bash
+# First-time setup with your API key
+npx mindstudio sync
+```
+
+4. **Start Using the Library**
 
 ```typescript
 import { MindStudio } from 'mindstudio';
 
 const client = new MindStudio('your-api-key');
 
-// Access type-safe workers (requires running 'npx mindstudio sync' first)
+// Use type-safe workers
 const { success, result } = await client.workers.myWorker.generateText({
   prompt: "Write a story about a space cat"
 });
+
+if (success) {
+  console.log(result);
+}
 ```
 
-### Direct Execution
+## Usage Guide
+
+### 1. Setting Up Your Project
+
+#### Environment Variables (Recommended)
+
+Create a `.env` file in your project root:
+
+```env
+MINDSTUDIO_KEY=your-api-key
+```
+
+#### Direct Configuration
+
+Or pass configuration when initializing:
 
 ```typescript
-import { MindStudio } from 'mindstudio';
+const client = new MindStudio('your-api-key', {
+  baseUrl: 'https://custom-api-endpoint.com'  // Optional
+});
+```
 
-const client = new MindStudio('your-api-key');
+### 2. Choose Your Usage Pattern
 
-// Direct worker execution (always available)
+#### Pattern A: Type-Safe Usage (Recommended)
+
+```typescript
+// Requires running 'npx mindstudio sync' first
+const { success, result } = await client.workers.myWorker.generateText({
+  prompt: "Write a story about a space cat"
+});
+
+if (success) {
+  console.log(result);
+}
+```
+
+Benefits:
+
+- Full TypeScript support
+- Auto-completion for workers and parameters
+- Compile-time validation
+- Better developer experience
+
+#### Pattern B: Direct Execution
+
+```typescript
+// Always available, no setup required
 const { success, result } = await client.run({
   workerId: "worker-id",
   workflow: "generateText",
@@ -51,107 +100,32 @@ const { success, result } = await client.run({
 });
 ```
 
-## Configuration
+Benefits:
 
-Create a `.env` file in your project root:
+- No setup required
+- Works without type definitions
+- Flexible for dynamic usage
 
-```env
-MINDSTUDIO_KEY=your-api-key
-MINDSTUDIO_BASE_URL=https://custom-api-endpoint.com  # Optional
-```
+### 3. Team Setup
 
-Or pass configuration when initializing:
-
-```typescript
-const client = new MindStudio('your-api-key', {
-  baseUrl: 'https://custom-api-endpoint.com'
-});
-```
-
-## Type Definitions
-
-The library provides comprehensive TypeScript definitions. After initialization, you'll get full type support for your workflows:
-
-```typescript
-// Import available types
-import { 
-  WorkflowResponse, 
-  OutputVarsResponse, 
-  StringResponse,
-  MindStudioWorkers 
-} from 'mindstudio';
-
-// Type-safe worker instance
-const client: MindStudio;
-const workers: MindStudioWorkers;
-
-// Workflow with output variables
-const response: OutputVarsResponse<{
-  blogPost: string;
-  title: string;
-}> = await client.workers.contentGenerator.createBlogPost({
-  topic: "AI Technology",
-  tone: "Professional"
-});
-
-// Workflow with string output
-const response: StringResponse = await client.workers.textGenerator.generateText({
-  prompt: "Write a story"
-});
-```
-
-## Response Types
-
-All workflow executions return a consistent structure:
-
-```typescript
-// Base response type
-interface WorkflowResponse<TResult> {
-  success: boolean;
-  result: TResult;
-  error?: any;
-  billingCost?: number;
-}
-
-// For workflows with output variables
-type OutputVarsResponse<T extends Record<string, string>> = WorkflowResponse<T>;
-
-// For workflows with string output
-type StringResponse = WorkflowResponse<string | undefined>;
-```
-
-## CLI Usage
-
-MindStudio includes a CLI for workspace management:
-
-### Sync Command
-
-The `sync` command handles both initialization and updates:
+1. **Initial Setup** (Project Owner)
 
 ```bash
-# Full sync - fetches latest config and generates types
+# Initialize workspace and commit configuration
 npx mindstudio sync
+git add .mindstudio.json
+git commit -m "Add MindStudio configuration"
+```
 
-# Offline mode - generates types from existing .mindstudio.json
+2. **Team Member Setup**
+
+```bash
+# After cloning the repository
+npm install
 npx mindstudio sync --offline
 ```
 
-#### When to use each mode
-
-- **Full Sync** (default):
-  - First-time setup
-  - When you create new workers
-  - When you update existing workers
-  - When you want to fetch the latest changes
-
-- **Offline Mode** (`--offline`):
-  - After running `npm install`
-  - In CI/CD environments
-  - When you just need to regenerate types
-  - When you have `.mindstudio.json` and don't need updates
-
-### Post-Install Type Generation
-
+3. **Automatic Type Generation** (Optional)
 Add to your `package.json`:
 
 ```json
@@ -162,23 +136,37 @@ Add to your `package.json`:
 }
 ```
 
-This automatically maintains your type definitions when:
+## CLI Commands
 
-- Installing on a new machine
-- Running `npm install`
-- Updating the mindstudio package
+### `sync`
 
-Note: Requires `.mindstudio.json` in your repository. Run `npx mindstudio sync`
-first to create this file.
+Initialize or update your workspace configuration and type definitions.
+
+```bash
+# Full sync (requires API key)
+npx mindstudio sync
+
+# Offline mode (requires existing .mindstudio.json)
+npx mindstudio sync --offline
+```
+
+Options:
+
+- `--key <apiKey>`: Override API key
+- `--base-url <url>`: Override API base URL
+- `--offline`: Generate types without API calls
+
+### `test`
+
+Test a workflow directly from the command line.
+
+```bash
+npx mindstudio test --worker myWorker --workflow generateText --input '{"prompt":"Hello"}'
+```
 
 ## Error Handling
 
-The library provides two levels of error handling:
-
-1. Workflow execution errors (returned in the response)
-2. Client-level errors (thrown as MindStudioError)
-
-### Workflow Execution Errors
+### 1. Workflow Execution Errors
 
 ```typescript
 const { success, result, error } = await client.workers.myWorker.generateText({
@@ -189,49 +177,79 @@ if (!success) {
   console.error('Workflow execution failed:', error);
   return;
 }
-
-console.log('Success:', result);
 ```
 
-### Client-Level Errors
+### 2. Client-Level Errors
 
 ```typescript
 import { MindStudioError } from 'mindstudio';
 
 try {
-  // These can throw MindStudioError:
   const client = new MindStudio('invalid-api-key');
-  await client.init();
-  
 } catch (error) {
   if (error instanceof MindStudioError) {
     console.error({
-      message: error.message,  // Error description
-      code: error.code,        // Error code (e.g., 'missing_api_key', 'init_failed')
-      status: error.status,    // HTTP status code (e.g., 400, 500)
-      details: error.details   // Additional error context
+      message: error.message,
+      code: error.code,
+      status: error.status,
+      details: error.details
     });
   }
 }
 ```
 
-Common error codes:
+## Troubleshooting
 
-- `missing_api_key`: API key not provided
-- `init_failed`: Failed to initialize client
-- `missing_input`: Required workflow input variables not provided
-- `invalid_input`: Input validation failed
-- `invalid_output`: Output validation failed
+### Common Issues
+
+1. **Types Not Available**
+
+   ```
+   Error: Type-safe workers not available
+   ```
+
+   Solution: Run `npx mindstudio sync` to generate type definitions
+
+2. **API Key Issues**
+
+   ```
+   Error: API key is required
+   ```
+
+   Solution: Ensure your API key is properly set in `.env` or passed to the constructor
+
+3. **Configuration Missing**
+
+   ```
+   Error: Failed to load configuration
+   ```
+
+   Solution: Run `npx mindstudio sync` to create initial configuration
+
+4. **Type Generation Fails**
+
+   ```
+   Error: Failed to generate types
+   ```
+
+   Solution: Try running with full sync: `npx mindstudio sync`
 
 ## Best Practices
 
-### Version Control
+1. **Version Control**
+   - Commit `.mindstudio.json` to your repository
+   - Add `.env` to `.gitignore`
+   - Use `postinstall` script for automatic type generation
 
-Commit `.mindstudio.json` to version control to ensure:
+2. **Error Handling**
+   - Always check `success` before using `result`
+   - Implement proper error handling for both workflow and client errors
+   - Use TypeScript for better type safety
 
-- Consistent worker configurations across your team
-- Type definitions can be regenerated on new installations
-- AI workflow changes can be tracked
+3. **Team Workflow**
+   - Run `sync` after pulling changes that modify `.mindstudio.json`
+   - Use `--offline` mode in CI/CD environments
+   - Keep worker configurations in sync across team
 
 ## License
 
