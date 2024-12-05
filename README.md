@@ -137,7 +137,7 @@ npx mindstudio sync --offline
   - When you just need to regenerate types
   - When you have `.mindstudio.json` and don't need updates
 
-### Post-Install Setup
+### Post-Install Type Generation
 
 Add to your `package.json`:
 
@@ -149,13 +149,14 @@ Add to your `package.json`:
 }
 ```
 
-This regenerates types automatically after:
+This automatically maintains your type definitions when:
 
 - Installing on a new machine
 - Running `npm install`
 - Updating the mindstudio package
 
-Note: Requires `.mindstudio.json` in your repository.
+Note: Requires `.mindstudio.json` in your repository. Run `npx mindstudio sync`
+first to create this file.
 
 ## Error Handling
 
@@ -226,7 +227,7 @@ Add to your `package.json`:
 ```json
 {
   "scripts": {
-    "postinstall": "mindstudio generate"
+    "postinstall": "mindstudio sync --offline"
   }
 }
 ```

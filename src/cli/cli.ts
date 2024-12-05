@@ -1,8 +1,8 @@
 import { Command } from "commander";
 import { TypeGenerator } from "../codegen";
+import { SyncCommand, TestCommand } from "./commands";
 import { ConfigManager } from "./config";
 import { Prompts } from "./prompts";
-import { GenerateCommand, SyncCommand, TestCommand } from "./commands";
 
 export class CLI {
   constructor(
@@ -36,9 +36,13 @@ export class CLI {
 
     this.program
       .command("sync")
-      .description("Initialize or sync MindStudio configuration and types")
+      .description("Initialize workspace and manage type definitions")
       .option("--key <apiKey>", "MindStudio API key")
       .option("--base-url <url>", "API base URL")
+      .option(
+        "--offline",
+        "Generate types from existing config without API calls"
+      )
       .action((options) => syncCmd.execute(options));
 
     this.program
