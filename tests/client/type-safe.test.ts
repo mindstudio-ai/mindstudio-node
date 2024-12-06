@@ -26,7 +26,7 @@ describe("Type-Safe Workflow Execution", () => {
     });
 
     const client = new MindStudio(TEST_API_KEY);
-    const result = await client.workers["test-worker"].generateText({
+    const result = await client.workers.TestWorker.generateText({
       prompt: "Hello",
     });
 
@@ -41,7 +41,7 @@ describe("Type-Safe Workflow Execution", () => {
 
     const client = new MindStudio(TEST_API_KEY);
     await expect(
-      client.workers["test-worker"].generateText({
+      client.workers.TestWorker.generateText({
         prompt: "Hello",
       })
     ).rejects.toThrow("Workflow failed");

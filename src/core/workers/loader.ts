@@ -72,7 +72,7 @@ export class WorkerLoader {
     const fn = async (variables?: MSVariables) => {
       return this.runFn({
         workerId: worker.id,
-        workflow: workflow.slug,
+        workflow: workflow.name,
         variables: variables || {},
       });
     };

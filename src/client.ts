@@ -40,7 +40,7 @@ export class MindStudio {
    */
   public async run(params: {
     workerId: string;
-    workflow: string;
+    workflow?: string;
     variables?: Record<string, string>;
   }): Promise<WorkflowResponse<any>> {
     try {

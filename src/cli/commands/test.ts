@@ -49,7 +49,14 @@ export class TestCommand extends BaseCommand {
       this.logDebug(`Input prepared: ${JSON.stringify(input)}`, options);
 
       console.log("\n Executing workflow...");
-      const result = await client.workers[worker][workflow](input);
+      const result = await client.run({
+        workerId: worker,
+        workflow:
+          config.workers
+            .find((w) => w.id === worker)
+            ?.workflows.find((w) => w.id === workflow)?.name || "",
+        variables: input,
+      });
 
       console.log("\n✨ Success!");
       console.log("Result:", JSON.stringify(result, null, 2));

@@ -11,16 +11,23 @@ export class Prompts {
         type: "list",
         name: "worker",
         message: "Select a worker:",
-        choices: Object.keys(config.workers),
+        choices: config.workers.map((worker) => ({
+          name: worker.name || worker.id, // Display name if available, fallback to id
+          value: worker.id,
+        })),
       },
     ]);
 
+    const selectedWorker = config.workers.find((w) => w.id === worker);
     const { workflow } = await inquirer.prompt([
       {
         type: "list",
         name: "workflow",
         message: "Select a workflow:",
-        choices: Object.keys(config.workers[worker].workflows),
+        choices: selectedWorker?.workflows.map((wf) => ({
+          name: wf.name || wf.id, // Display name if available, fallback to id
+          value: wf.id,
+        })),
       },
     ]);
 
