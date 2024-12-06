@@ -37,14 +37,13 @@ export class CLI {
     this.program
       .command("sync")
       .description("Initialize workspace and manage type definitions")
-      .option("--key <apiKey>", "MindStudio API key")
-      .option("--base-url <url>", "API base URL")
       .option(
         "--offline",
         "Generate types from existing config without API calls"
       )
-      .option("-v, --verbose", "Enable verbose logging")
-      .action((options) => syncCmd.execute(options));
+      .action((options) =>
+        syncCmd.execute({ ...this.program.opts(), ...options })
+      );
 
     this.program
       .command("test")
@@ -52,16 +51,16 @@ export class CLI {
       .option("--worker <worker>", "Worker name")
       .option("--workflow <workflow>", "Workflow name")
       .option("--input <input>", "Input JSON string")
-      .option("-v, --verbose", "Enable verbose logging")
-      .action((options) => testCmd.execute(options));
+      .action((options) =>
+        testCmd.execute({ ...this.program.opts(), ...options })
+      );
 
     this.program
       .command("list")
       .description("List available workers and their workflows")
-      .option("--key <apiKey>", "MindStudio API key")
-      .option("--base-url <url>", "API base URL")
-      .option("-v, --verbose", "Enable verbose logging")
-      .action((options) => listCmd.execute(options));
+      .action((options) =>
+        listCmd.execute({ ...this.program.opts(), ...options })
+      );
   }
 
   public async run(args: string[]): Promise<void> {
