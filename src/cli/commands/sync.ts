@@ -13,7 +13,7 @@ export class SyncCommand {
   ) {}
 
   public async execute(options: SyncOptions): Promise<void> {
-    const configExists = await this.config.exists();
+    const configExists = this.config.exists();
     const isCI = process.env.CI === "true";
     const isOffline = options.offline || isCI;
 
@@ -22,11 +22,11 @@ export class SyncCommand {
         console.log("\n🔍 Found existing configuration");
         console.log("📝 Generating type definitions...");
 
-        const config = await this.config.load();
+        const config = this.config.load();
         const types = this.typeGenerator.generateTypes(
           this.config.convertToWorkerWorkflows(config)
         );
-        await this.config.writeTypes(types);
+        this.config.writeTypes(types);
 
         console.log("✨ Successfully generated type definitions");
         console.log("   Types available in: node_modules/mindstudio/types\n");
@@ -76,12 +76,12 @@ export class SyncCommand {
         })),
       };
 
-      await this.config.write(config);
+      this.config.write(config);
       console.log("💾 Configuration saved to .mindstudio.json");
 
       console.log("📝 Generating type definitions...");
       const types = this.typeGenerator.generateTypes(workers);
-      await this.config.writeTypes(types);
+      this.config.writeTypes(types);
 
       console.log(
         "\n✨ Success!" +
