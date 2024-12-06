@@ -25,17 +25,23 @@ npm install mindstudio
    **Option A: Type-Safe Usage (Recommended)**
 
    ```typescript
-   // Initialize the client
-   const client = new MindStudio(process.env.MINDSTUDIO_KEY);
+   try {
+     // Initialize the client
+     const client = new MindStudio(process.env.MINDSTUDIO_KEY);
 
-   // Execute a workflow
-   const { success, result } = await client.workers.myWorker.generateText({
-     prompt: "Write a story about a space cat"
-   });
+     // Execute a workflow
+     // Note: Replace 'MyWorker' and 'generateText' with your actual worker and workflow names
+     // Run 'npx mindstudio list' to see available workers and workflows
+     const { result, billingCost } = await client.workers.MyWorker.generateText({
+       prompt: "Write a story about a space cat"
+     });
 
-   // Handle the response
-   if (success) {
-     console.log(result);
+     console.log('Generated text:', result);
+     console.log('Execution cost:', billingCost);
+   } catch (error) {
+     if (error instanceof MindStudioError) {
+       console.error('Workflow failed:', error.message);
+     }
    }
    ```
 
@@ -44,14 +50,23 @@ npm install mindstudio
    ```typescript
    import { MindStudio } from 'mindstudio';
    
-   const client = new MindStudio(process.env.MINDSTUDIO_KEY);
-   const { success, result } = await client.run({
-     workerId: "your-worker-id",
-     workflow: "generateText",
-     variables: {
-       prompt: "Write a story about a space cat"
+   try {
+     const client = new MindStudio(process.env.MINDSTUDIO_KEY);
+     const { result, billingCost } = await client.run({
+       workerId: "your-worker-id",  // Get this from 'npx mindstudio list'
+       workflow: "generateText",     // Get this from 'npx mindstudio list'
+       variables: {
+         prompt: "Write a story about a space cat"
+       }
+     });
+
+     console.log('Generated text:', result);
+     console.log('Execution cost:', billingCost);
+   } catch (error) {
+     if (error instanceof MindStudioError) {
+       console.error('Workflow failed:', error.message);
      }
-   });
+   }
    ```
 
 ---
@@ -62,10 +77,8 @@ All workflow executions return a consistent response type:
 
 ```typescript
 interface WorkflowResponse<T> {
-  success: boolean;
-  result?: T;          // The workflow result when success is true
-  error?: Error;       // Error details when success is false
-  billingCost?: string // Execution cost in credits
+  result: T;          // The workflow execution result
+  billingCost?: string // Execution cost in credits (optional)
 }
 ```
 
@@ -100,17 +113,27 @@ Options:
   -v, --verbose      Enable verbose logging
 
 # Example output:
-Available Workers:
+📦 Available Workers
 
-• Text Generator (textGenerator)
-  └─ Generate Text (generateText)
-     ├─ Input: prompt
-     └─ Output: text
+Text Generator
+Import: workers.TextGenerator
 
-• Image Generator (imageGenerator)
-  └─ Create Image (createImage)
-     ├─ Input: description, style
-     └─ Output: imageUrl
+  🔹 Generate Text
+    └─ workers.TextGenerator.generateText({ prompt })
+       Returns: { text }
+
+──────────────────────────────────────────────────────
+
+Image Generator
+Import: workers.ImageGenerator
+
+  🔹 Create Image
+    └─ workers.ImageGenerator.createImage({ description, style })
+       Returns: { imageUrl }
+
+──────────────────────────────────────────────────────
+
+💡 Run 'npx mindstudio sync' to generate type definitions for these workers
 ```
 
 ### `test`
@@ -121,20 +144,15 @@ Test a workflow:
 npx mindstudio test [options]
 
 Options:
-  --worker <worker>    Worker name
-  --workflow <name>    Workflow name
-  --input <json>      Input JSON string
+  --worker <worker>    Worker name (optional, will prompt if not provided)
+  --workflow <name>    Workflow name (optional, will prompt if not provided)
+  --input <json>      Input JSON string (optional, will prompt if not provided)
   --key <apiKey>      Override API key
   --base-url <url>    Override API base URL
   -v, --verbose       Enable verbose logging
 ```
 
-The `-v, --verbose` flag enables detailed logging for debugging purposes. When enabled, you'll see:
-
-- Configuration loading details
-- API interactions
-- Detailed error messages
-- Process steps and outcomes
+If worker, workflow, or input are not provided, the command will enter interactive mode and prompt for the required information.
 
 ---
 
@@ -143,16 +161,18 @@ The `-v, --verbose` flag enables detailed logging for debugging purposes. When e
 1. **Project Owner:**
 
    ```bash
+   # Generate initial configuration and types
    npx mindstudio sync
-   git add .mindstudio.json
-   git commit -m "Add MindStudio configuration"
+   
+   # Commit .mindstudio.json to version control
+   # This ensures consistent type definitions across your team
    ```
 
 2. **Team Members:**
 
    ```bash
    npm install
-   npx mindstudio sync --offline
+   npx mindstudio sync
    ```
 
 Optional: Add to `package.json` for automatic type generation:
@@ -160,7 +180,7 @@ Optional: Add to `package.json` for automatic type generation:
 ```json
 {
   "scripts": {
-    "postinstall": "npx mindstudio sync --offline"
+    "postinstall": "npx mindstudio sync"
   }
 }
 ```
@@ -207,17 +227,27 @@ For security best practices:
 ## ❌ Error Handling
 
 ```typescript
-// Workflow errors
-const { success, result, error } = await client.workers.myWorker.generateText({
-  prompt: "Hello"
-});
+import { MindStudio, MindStudioError } from 'mindstudio';
 
-if (!success) {
-  console.error('Workflow failed:', error);
-  return;
+// Workflow execution
+try {
+  const client = new MindStudio(process.env.MINDSTUDIO_KEY);
+  // Note: Replace 'MyWorker' with your actual worker name from 'npx mindstudio list'
+  const { result } = await client.workers.MyWorker.generateText({
+    prompt: "Hello"
+  });
+  console.log('Generated text:', result);
+} catch (error) {
+  if (error instanceof MindStudioError) {
+    console.error('Workflow failed:', error.message);
+    // Access additional error details if needed
+    console.error('Error code:', error.code);
+    console.error('Error status:', error.status);
+    console.error('Error details:', error.details);
+  }
 }
 
-// Client errors
+// Client initialization
 try {
   const client = new MindStudio('invalid-key');
 } catch (error) {
@@ -252,12 +282,14 @@ try {
 
 2. **Type Safety**
    - Use the type-safe pattern when possible
-   - Commit `.mindstudio.json` to version control
-   - Run `sync` after pulling changes
+   - Keep your types up to date by running `sync` after API changes
+   - Generated types are available in `dist/src/generated`
+   - Commit `.mindstudio.json` to version control for consistent types across your team
 
 3. **Error Handling**
-   - Always check `success` before using `result`
-   - Implement proper error handling
+   - Use try-catch blocks to handle errors
+   - Check for `MindStudioError` instances for detailed error information
+   - Implement proper error logging and monitoring
    - Use TypeScript for better type safety
 
 ---
