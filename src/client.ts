@@ -11,11 +11,12 @@ export class MindStudio {
   private _workers?: MindStudioWorkers;
   private apiKey: string;
 
-  constructor(apiKey?: string) {
+  constructor(apiKey?: string, options?: { baseUrl?: string }) {
     this.apiKey = KeyManager.resolveKey(apiKey);
-    KeyManager.validateKey(this.apiKey);
 
-    this.httpClient = new HttpClient(this.apiKey);
+    this.httpClient = new HttpClient(this.apiKey, {
+      baseUrl: options?.baseUrl,
+    });
     this.workerLoader = new WorkerLoader(this.run.bind(this));
     this._workers = this.workerLoader.loadFromConfig();
   }

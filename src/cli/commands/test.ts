@@ -16,7 +16,9 @@ export class TestCommand implements BaseCommand {
       const config = this.config.readConfig();
       const apiKey = KeyManager.resolveKey(options.key);
 
-      const client = new MindStudio(apiKey);
+      const client = new MindStudio(apiKey, {
+        baseUrl: options.baseUrl,
+      });
 
       const { worker, workflow } =
         options.worker && options.workflow
@@ -36,11 +38,12 @@ export class TestCommand implements BaseCommand {
       console.log("Result:", JSON.stringify(result, null, 2));
     } catch (error) {
       if (error instanceof SyntaxError) {
-        console.error("Invalid JSON input:", error.message);
+        console.error("Invalid JSON input:\n" + error.message);
+      } else if (error instanceof Error) {
+        console.error("Test failed:\n" + error.message);
       } else {
         console.error("Test failed:", error);
       }
-      console.error("This will not affect your application runtime.");
     }
   }
 }

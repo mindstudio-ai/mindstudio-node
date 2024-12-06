@@ -39,20 +39,4 @@ export class KeyManager {
       400
     );
   }
-
-  /**
-   * Validates the API key format
-   */
-  static validateKey(apiKey: string): boolean {
-    if (!apiKey || typeof apiKey !== "string" || apiKey.trim().length === 0) {
-      const error = new MindStudioError(
-        "Invalid API key format",
-        "invalid_api_key",
-        400
-      );
-      error.message += this.API_KEY_ERROR_MESSAGE;
-      throw error;
-    }
-    return true;
-  }
 }

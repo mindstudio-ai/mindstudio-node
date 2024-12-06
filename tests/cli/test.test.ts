@@ -5,60 +5,73 @@ import { mockConfig } from "../__fixtures__/config";
 import { setupApiMock } from "../__fixtures__/api";
 import fs from "fs";
 
-describe("Test Command Integration", () => {
+describe("Test Command", () => {
   const CONFIG_PATH = ".mindstudio.json";
   let testCommand: TestCommand;
   let config: ConfigManager;
   let prompts: Prompts;
+  let originalEnv: NodeJS.ProcessEnv;
   const apiMock = setupApiMock();
 
   beforeEach(() => {
+    // Save original env
+    originalEnv = { ...process.env };
+
     // Initialize fresh components
     config = new ConfigManager();
     prompts = new Prompts();
     testCommand = new TestCommand(config, prompts);
 
-    // Setup mock config
-    fs.writeFileSync(CONFIG_PATH, JSON.stringify(mockConfig));
+    // Reset environment
+    delete process.env.MINDSTUDIO_KEY;
 
     // Reset API mocks
     apiMock.reset();
 
-    // Reset environment
-    delete process.env.MINDSTUDIO_KEY;
+    // Setup mock config
+    fs.writeFileSync(CONFIG_PATH, JSON.stringify(mockConfig));
+
+    // Mock successful API response
+    apiMock.mockWorkflowExecution({
+      result: "Generated test result",
+      billingCost: "0.01",
+    });
   });
 
   afterEach(() => {
+    // Restore original env
+    process.env = originalEnv;
+
+    // Cleanup files
     if (fs.existsSync(CONFIG_PATH)) {
       fs.unlinkSync(CONFIG_PATH);
     }
+
+    // Clear all mocks
+    jest.clearAllMocks();
   });
 
-  describe("Direct workflow execution", () => {
+  describe("Direct Workflow Execution", () => {
     it("should execute workflow with provided parameters", async () => {
-      // Mock successful API response
-      apiMock.mockWorkflowExecution({
-        result: "Generated story about a space cat",
-        billingCost: "0.01",
-      });
-
-      jest.spyOn(prompts, "getApiKey").mockResolvedValue("test-api-key");
+      process.env.MINDSTUDIO_KEY = "test-api-key";
 
       await testCommand.execute({
         worker: "test-worker",
         workflow: "generateText",
-        input: '{"prompt":"Write a story about a space cat"}',
+        input: '{"prompt":"Test input"}',
       });
 
-      // Verify console output
-      expect(console.log).toHaveBeenCalledWith(
-        "Result:",
-        expect.stringContaining("Generated story about a space cat")
-      );
+      const apiCalls = apiMock.getHistory().post;
+      expect(JSON.parse(apiCalls[0].data)).toMatchObject({
+        workerId: "test-worker-id",
+        workflow: "generateText",
+        variables: { prompt: "Test input" },
+      });
     });
 
-    it("should handle invalid JSON input gracefully", async () => {
-      jest.spyOn(prompts, "getApiKey").mockResolvedValue("test-api-key");
+    it("should handle invalid JSON input", async () => {
+      process.env.MINDSTUDIO_KEY = "test-api-key";
+      const consoleSpy = jest.spyOn(console, "error");
 
       await testCommand.execute({
         worker: "test-worker",
@@ -66,21 +79,16 @@ describe("Test Command Integration", () => {
         input: "invalid json",
       });
 
-      expect(console.error).toHaveBeenCalledWith(
-        "Invalid JSON input:",
-        expect.any(String)
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining("Invalid JSON input:")
       );
-    }, 10000);
+    });
   });
 
-  describe("Interactive workflow selection", () => {
+  describe("Interactive Workflow Selection", () => {
     it("should prompt for worker and workflow when not provided", async () => {
-      apiMock.mockWorkflowExecution({
-        result: "Test result",
-        billingCost: "0.01",
-      });
+      process.env.MINDSTUDIO_KEY = "test-api-key";
 
-      jest.spyOn(prompts, "getApiKey").mockResolvedValue("test-api-key");
       jest.spyOn(prompts, "selectWorkerAndWorkflow").mockResolvedValue({
         worker: "test-worker",
         workflow: "generateText",
@@ -91,21 +99,15 @@ describe("Test Command Integration", () => {
 
       await testCommand.execute({});
 
-      expect(prompts.selectWorkerAndWorkflow).toHaveBeenCalled();
-      expect(prompts.getWorkflowInput).toHaveBeenCalled();
-      expect(console.log).toHaveBeenCalledWith(
-        "Result:",
-        expect.stringContaining("Test result")
-      );
+      const apiCalls = apiMock.getHistory().post;
+      expect(JSON.parse(apiCalls[0].data)).toMatchObject({
+        variables: { prompt: "Interactive input" },
+      });
     });
   });
 
-  describe("API key handling", () => {
+  describe("API Key Handling", () => {
     it("should use provided API key", async () => {
-      apiMock.mockWorkflowExecution({ result: "Success" });
-
-      const getApiKeySpy = jest.spyOn(prompts, "getApiKey");
-
       await testCommand.execute({
         key: "custom-api-key",
         worker: "test-worker",
@@ -113,11 +115,15 @@ describe("Test Command Integration", () => {
         input: "{}",
       });
 
-      expect(getApiKeySpy).toHaveBeenCalledWith("custom-api-key");
+      const apiCalls = apiMock.getHistory().post;
+      expect(apiCalls[0].headers).toHaveProperty(
+        "Authorization",
+        "Bearer custom-api-key"
+      );
     });
 
     it("should fail gracefully when no API key is available", async () => {
-      jest.spyOn(prompts, "getApiKey").mockResolvedValue("");
+      const consoleSpy = jest.spyOn(console, "error");
 
       await testCommand.execute({
         worker: "test-worker",
@@ -125,51 +131,43 @@ describe("Test Command Integration", () => {
         input: "{}",
       });
 
-      expect(console.error).toHaveBeenCalledWith(
-        "No API key provided. Set MINDSTUDIO_KEY in your environment or .env file"
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining("API key not found")
       );
     });
   });
 
-  describe("Error handling", () => {
-    beforeEach(() => {
-      jest.clearAllMocks(); // Clear console mocks
-    });
+  describe("Custom Base URL", () => {
+    it("should use custom base URL when provided", async () => {
+      process.env.MINDSTUDIO_KEY = "test-api-key";
+      const customUrl = "https://custom-api.example.com";
 
+      await testCommand.execute({
+        baseUrl: customUrl,
+        worker: "test-worker",
+        workflow: "generateText",
+        input: "{}",
+      });
+
+      const apiCalls = apiMock.getHistory().post;
+      expect(apiCalls[0].baseURL).toContain(customUrl);
+    });
+  });
+
+  describe("Error Handling", () => {
     it("should handle API errors gracefully", async () => {
+      process.env.MINDSTUDIO_KEY = "test-api-key";
       apiMock.mockWorkflowExecutionError(new Error("API Error"));
-      jest.spyOn(prompts, "getApiKey").mockResolvedValue("test-api-key");
+      const consoleSpy = jest.spyOn(console, "error");
 
       await testCommand.execute({
         worker: "test-worker",
         workflow: "generateText",
         input: '{"prompt": "test"}',
-        key: "test-api-key",
       });
 
-      expect(console.error).toHaveBeenCalledWith(
-        "Test failed:",
-        expect.any(Error)
-      );
-    });
-  });
-
-  describe("Custom base URL", () => {
-    it("should use custom base URL when provided", async () => {
-      apiMock.mockWorkflowExecution({ result: "Success" });
-
-      jest.spyOn(prompts, "getApiKey").mockResolvedValue("test-api-key");
-
-      await testCommand.execute({
-        baseUrl: "https://custom-api.example.com",
-        worker: "test-worker",
-        workflow: "generateText",
-        input: "{}",
-      });
-
-      // Verify the custom base URL was used in the API call
-      expect(apiMock.getHistory().post[0].baseURL).toBe(
-        "https://custom-api.example.com"
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining("Test failed:")
       );
     });
   });
