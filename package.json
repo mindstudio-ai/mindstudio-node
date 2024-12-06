@@ -88,5 +88,6 @@
     "type": "url",
     "url": "https://www.mindstudio.ai"
   },
-  "sideEffects": false
+  "sideEffects": false,
+  "type": "commonjs"
 }
