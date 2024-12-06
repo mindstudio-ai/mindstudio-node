@@ -1,7 +1,7 @@
 import { HttpClient } from "@core/http/client";
 import { HttpClientConfig, WorkflowExecutionResponse } from "@core/types";
 import { WorkerLoader } from "@core/workers/loader";
-import { MindStudioWorkers } from "@generated/workers";
+import { MindStudioWorkers } from "@mindstudio/types";
 import { MindStudioError } from "./errors";
 import { WorkflowResponse } from "./types";
 

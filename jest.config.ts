@@ -8,10 +8,6 @@ export default {
     "^@mindstudio/(.*)$": "<rootDir>/src/$1",
     "^@cli/(.*)$": "<rootDir>/src/cli/$1",
   },
-  collectCoverageFrom: [
-    "src/public/**/*.ts",
-    "src/cli/**/*.ts",
-    "!src/generated/**",
-  ],
+  collectCoverageFrom: ["src/**/*.ts"],
   watchPathIgnorePatterns: ["node_modules", "dist", "coverage"],
 };

@@ -20,3 +20,5 @@ export interface WorkflowFunction<TInput = any, TOutput = any> {
     };
   };
 }
+
+export * from "./generated/workers";

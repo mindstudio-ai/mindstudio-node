@@ -20,9 +20,6 @@
             ],
             "@cli/*": [
                 "src/cli/*"
-            ],
-            "@generated/*": [
-                "src/generated/*"
             ]
         }
     },
