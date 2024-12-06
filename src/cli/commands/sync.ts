@@ -47,6 +47,8 @@ export class SyncCommand extends BaseCommand {
     this.logDebug(`CI environment: ${isCI}`, options);
     this.logDebug(`Offline mode: ${isOffline}`, options);
 
+    console.log(options);
+
     if (configExists && isOffline) {
       try {
         console.log("\n🔍 Found existing configuration");
