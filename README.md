@@ -96,6 +96,18 @@ Test a workflow from the command line:
 npx mindstudio test --worker myWorker --workflow generateText --input '{"prompt":"Hello"}'
 ```
 
+### `list`
+
+List available workers and workflows:
+
+```bash
+# List from existing configuration
+npx mindstudio list
+
+# List from API (if no configuration exists)
+npx mindstudio list --key your-api-key
+```
+
 ---
 
 ## 🧑‍💻 Team Usage

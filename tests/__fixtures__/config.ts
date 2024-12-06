@@ -19,7 +19,7 @@ export const mockConfig = {
           name: "Generate Text",
           slug: "generateText",
           launchVariables: ["prompt"],
-          outputVariables: [],
+          outputVariables: ["text"],
         },
       ],
     },
