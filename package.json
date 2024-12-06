@@ -31,7 +31,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "mindstudio": "./dist/cli/index.js"
+    "mindstudio": "dist/src/cli/index.js"
   },
   "exports": {
     ".": {
@@ -61,7 +61,7 @@
     "preversion": "npm run test",
     "version": "npm run build && git add -f -A dist",
     "postversion": "git push && git push --tags",
-    "publish:all": "npm publish && npm publish --registry https://npm.pkg.github.com"
+    "publish:npm": "npm publish --access public"
   },
   "dependencies": {
     "axios": "^1.7.7",
@@ -85,8 +85,7 @@
   },
   "publishConfig": {
     "access": "public",
-    "registry": "https://registry.npmjs.org/",
-    "@mindstudio-ai:registry": "https://npm.pkg.github.com"
+    "registry": "https://registry.npmjs.org/"
   },
   "volta": {
     "node": "18.x"
