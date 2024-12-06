@@ -42,7 +42,8 @@
     "!tests"
   ],
   "scripts": {
-    "build": "tsc && chmod +x dist/src/cli/index.js",
+    "clean": "rm -rf dist",
+    "build": "npm run clean && tsc && chmod +x dist/src/cli/index.js",
     "test": "jest --runInBand",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
