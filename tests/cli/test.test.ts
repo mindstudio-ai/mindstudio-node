@@ -1,6 +1,6 @@
-import { TestCommand } from "@cli/commands/test";
-import { ConfigManager } from "@core/config/manager";
-import { Prompts } from "@cli/services/prompts";
+import { TestCommand } from "../../src/cli/commands/test";
+import { ConfigManager } from "../../src/core/config/manager";
+import { Prompts } from "../../src/cli/services/prompts";
 import { mockConfig } from "../__fixtures__/config";
 import { setupApiMock } from "../__fixtures__/api";
 import fs from "fs";
@@ -169,6 +169,72 @@ describe("Test Command", () => {
       expect(consoleSpy).toHaveBeenCalledWith(
         expect.stringContaining("Test failed:")
       );
+    });
+  });
+
+  describe("Verbose Logging", () => {
+    it("should show workflow execution details in verbose mode", async () => {
+      process.env.MINDSTUDIO_KEY = "test-api-key";
+      const consoleSpy = jest.spyOn(console, "log");
+
+      await testCommand.execute({
+        verbose: true,
+        worker: "test-worker",
+        workflow: "generateText",
+        input: '{"prompt":"Test input"}',
+      });
+
+      const allCalls = consoleSpy.mock.calls.flat().join("\n");
+      expect(allCalls).toContain("🔍 Debug: Loaded config");
+    });
+
+    it("should show detailed API response in verbose mode", async () => {
+      process.env.MINDSTUDIO_KEY = "test-api-key";
+      const consoleSpy = jest.spyOn(console, "log");
+      consoleSpy.mockClear();
+
+      await testCommand.execute({
+        verbose: true,
+        worker: "test-worker",
+        workflow: "generateText",
+        input: '{"prompt":"Test input"}',
+      });
+
+      const allCalls = consoleSpy.mock.calls.flat().join("\n");
+      expect(allCalls).toContain("Result:");
+    });
+
+    it("should show full error details in verbose mode", async () => {
+      process.env.MINDSTUDIO_KEY = "test-api-key";
+      const testError = new Error("API execution failed");
+      apiMock.mockWorkflowExecutionError(testError);
+      const consoleSpy = jest.spyOn(console, "error");
+
+      await testCommand.execute({
+        verbose: true,
+        worker: "test-worker",
+        workflow: "generateText",
+        input: '{"prompt":"Test input"}',
+      });
+
+      const allCalls = consoleSpy.mock.calls.flat().join("\n");
+      expect(allCalls).toContain("Network Error");
+    });
+
+    it("should not show debug logs when verbose is disabled", async () => {
+      process.env.MINDSTUDIO_KEY = "test-api-key";
+      const consoleSpy = jest.spyOn(console, "log");
+      consoleSpy.mockClear();
+
+      await testCommand.execute({
+        verbose: false,
+        worker: "test-worker",
+        workflow: "generateText",
+        input: '{"prompt":"Test input"}',
+      });
+
+      const calls = consoleSpy.mock.calls.map((call) => call[0]).join("\n");
+      expect(calls).not.toContain("🔍 Debug:");
     });
   });
 });

@@ -1,5 +1,4 @@
 import { MindStudio } from "../../src/client";
-import { KeyManager } from "../../src/core/auth/keyManager";
 
 describe("MindStudio Client Initialization", () => {
   let originalEnv: NodeJS.ProcessEnv;

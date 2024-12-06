@@ -1,28 +1,21 @@
 {
     "compilerOptions": {
         "target": "es2019",
-        "module": "esnext",
+        "module": "commonjs",
         "moduleResolution": "node",
         "declaration": true,
         "declarationDir": "./dist",
         "outDir": "./dist",
+        "rootDirs": [
+            "./src",
+            "./tests"
+        ],
         "strict": true,
         "esModuleInterop": true,
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
         "resolveJsonModule": true,
-        "baseUrl": ".",
-        "paths": {
-            "@core/*": [
-                "src/core/*"
-            ],
-            "@mindstudio/*": [
-                "src/*",
-            ],
-            "@cli/*": [
-                "src/cli/*"
-            ]
-        }
+        "allowJs": true
     },
     "include": [
         "src/**/*",

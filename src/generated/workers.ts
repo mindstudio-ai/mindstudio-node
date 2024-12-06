@@ -1,4 +1,4 @@
-import { WorkflowFunction } from "@mindstudio/types";
+import { WorkflowFunction } from "../types";
 
 // This file will be overwritten by the sync command
 export interface MindStudioWorkers {

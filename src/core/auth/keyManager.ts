@@ -1,5 +1,5 @@
 import * as dotenv from "dotenv";
-import { MindStudioError } from "@mindstudio/errors";
+import { MindStudioError } from "../../errors";
 
 export class KeyManager {
   private static readonly API_KEY_ERROR_MESSAGE =
@@ -28,7 +28,9 @@ export class KeyManager {
     }
 
     // 3. Try loading from .env file
-    dotenv.config();
+    if (process.env.NODE_ENV !== "test") {
+      dotenv.config();
+    }
     if (process.env.MINDSTUDIO_KEY) {
       return process.env.MINDSTUDIO_KEY;
     }

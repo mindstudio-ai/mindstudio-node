@@ -1,6 +1,6 @@
-import { SyncCommand } from "@cli/commands/sync";
-import { TypeGenerator } from "@cli/services/generator";
-import { ConfigManager } from "@core/config/manager";
+import { SyncCommand } from "../../src/cli/commands/sync";
+import { TypeGenerator } from "../../src/cli/services/generator";
+import { ConfigManager } from "../../src/core/config/manager";
 import fs from "fs";
 import { setupApiMock } from "../__fixtures__/api";
 import { mockConfig } from "../__fixtures__/config";
@@ -240,6 +240,55 @@ describe("Sync Command", () => {
 
       const types = fs.readFileSync(`${TYPES_PATH}/workers.d.ts`, "utf-8");
       expect(types).toContain("EmptyWorker: EmptyWorkerWorker");
+    });
+  });
+
+  describe("Verbose Logging", () => {
+    it("should show configuration details in verbose mode", async () => {
+      process.env.MINDSTUDIO_KEY = "test-key";
+      const consoleSpy = jest.spyOn(console, "log");
+
+      await syncCommand.execute({ verbose: true });
+
+      const allCalls = consoleSpy.mock.calls.flat().join("\n");
+      expect(allCalls).toContain("🔍 Debug: Config exists");
+    });
+
+    it("should show detailed type generation info in verbose mode", async () => {
+      process.env.MINDSTUDIO_KEY = "test-key";
+      const consoleSpy = jest.spyOn(console, "log");
+
+      await syncCommand.execute({ verbose: true });
+
+      const allCalls = consoleSpy.mock.calls.flat().join("\n");
+      expect(allCalls).toContain("📝 Generating type definitions");
+    });
+
+    it("should show full error stack in verbose mode", async () => {
+      process.env.MINDSTUDIO_KEY = "test-key";
+      const testError = new Error("Type generation failed");
+      jest
+        .spyOn(TypeGenerator.prototype, "generateTypes")
+        .mockImplementation(() => {
+          throw testError;
+        });
+      const consoleSpy = jest.spyOn(console, "error");
+
+      await syncCommand.execute({ verbose: true });
+
+      const allCalls = consoleSpy.mock.calls.flat().join("\n");
+      expect(allCalls).toContain("API key not found");
+    });
+
+    it("should not show debug logs when verbose is disabled", async () => {
+      process.env.MINDSTUDIO_KEY = "test-key";
+      const consoleSpy = jest.spyOn(console, "log");
+      consoleSpy.mockClear(); // Clear previous calls
+
+      await syncCommand.execute({ verbose: false });
+
+      const calls = consoleSpy.mock.calls.map((call) => call[0]).join("\n");
+      expect(calls).not.toContain("🔍 Debug:");
     });
   });
 });

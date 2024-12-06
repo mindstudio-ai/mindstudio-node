@@ -13,9 +13,8 @@ export class ConfigManager {
   }
 
   writeTypes(types: string): void {
-    const typesDir = ConfigPaths.getTypesPath();
-    fs.mkdirSync(typesDir, { recursive: true });
-    fs.writeFileSync(path.join(typesDir, "workers.d.ts"), types);
+    const typesPath = ConfigPaths.getTypesPath();
+    fs.writeFileSync(path.join(typesPath, "workers.d.ts"), types);
   }
 
   readConfig(): Config {

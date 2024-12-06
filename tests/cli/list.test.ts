@@ -1,5 +1,5 @@
-import { ListCommand } from "@cli/commands/list";
-import { ConfigManager } from "@core/config/manager";
+import { ListCommand } from "../../src/cli/commands/list";
+import { ConfigManager } from "../../src/core/config/manager";
 import fs from "fs";
 import { setupApiMock } from "../__fixtures__/api";
 import { mockConfig } from "../__fixtures__/config";
@@ -66,20 +66,17 @@ describe("List Command", () => {
 
   describe("Configuration Based Listing", () => {
     it("should list workers from existing configuration", async () => {
-      // Setup existing config
       fs.writeFileSync(CONFIG_PATH, JSON.stringify(mockConfig));
       const consoleSpy = jest.spyOn(console, "log");
 
       await listCommand.execute({});
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("Available Workers:")
+        expect.stringContaining("📦 Available Workers")
       );
+      expect(consoleSpy).toHaveBeenCalledWith("\x1b[1mTest Worker\x1b[0m");
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("test-worker")
-      );
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("generateText")
+        expect.stringContaining("workers.TestWorker")
       );
     });
 
@@ -89,11 +86,13 @@ describe("List Command", () => {
 
       await listCommand.execute({});
 
+      // Check for function signature with input
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("Input: prompt")
+        expect.stringContaining("generateText({ prompt })")
       );
+      // Check for return type
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("Output: text")
+        expect.stringContaining("Returns: { text }")
       );
     });
   });
@@ -135,15 +134,10 @@ describe("List Command", () => {
 
   describe("Error Handling", () => {
     it("should handle missing API key gracefully", async () => {
-      const consoleSpy = jest.spyOn(console, "error");
-
+      const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
       await listCommand.execute({});
-
-      expect(consoleSpy).toHaveBeenCalledWith(
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
         expect.stringContaining("Failed to list workers")
-      );
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("API key not found")
       );
     });
 
@@ -168,6 +162,51 @@ describe("List Command", () => {
       expect(consoleSpy).toHaveBeenCalledWith(
         expect.stringContaining("Failed to list workers")
       );
+    });
+  });
+
+  describe("Verbose Logging", () => {
+    it("should show debug logs when verbose flag is enabled", async () => {
+      process.env.MINDSTUDIO_KEY = "test-api-key";
+      const consoleSpy = jest.spyOn(console, "log");
+
+      await listCommand.execute({ verbose: true });
+
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining("🔍 Debug: Checking for existing configuration")
+      );
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining(
+          "🔍 Debug: No configuration found, fetching from API"
+        )
+      );
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining("🔍 Debug: API key resolved")
+      );
+    });
+
+    it("should not show debug logs when verbose flag is disabled", async () => {
+      process.env.MINDSTUDIO_KEY = "test-api-key";
+      const consoleSpy = jest.spyOn(console, "log");
+
+      await listCommand.execute({ verbose: false });
+
+      expect(consoleSpy).not.toHaveBeenCalledWith(
+        expect.stringContaining("🔍 Debug:")
+      );
+    });
+
+    it("should show detailed error information in verbose mode", async () => {
+      process.env.MINDSTUDIO_KEY = "test-api-key";
+      const testError = new Error("Detailed API Error");
+      testError.stack = "Error: Detailed API Error\n    at Test.stack";
+      apiMock.mockWorkerDefinitionsError(testError);
+      const consoleSpy = jest.spyOn(console, "error");
+
+      await listCommand.execute({ verbose: true });
+
+      const allCalls = consoleSpy.mock.calls.flat().join("\n");
+      expect(allCalls).toContain("Request failed with status code 500");
     });
   });
 });

@@ -1,6 +1,6 @@
 {
   "name": "mindstudio",
-  "version": "0.7.9",
+  "version": "0.7.12-4",
   "description": "Client library for MindStudio AI Workers",
   "author": "MindStudio AI <support@mindstudio.ai> (https://www.mindstudio.ai)",
   "license": "MIT",
@@ -22,16 +22,16 @@
     "node-client",
     "api-client"
   ],
-  "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
   "bin": {
     "mindstudio": "dist/src/cli/index.js"
   },
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "types": "./dist/src/index.d.ts",
+      "require": "./dist/src/index.js",
+      "default": "./dist/src/index.js"
     }
   },
   "files": [
@@ -43,7 +43,8 @@
     "!tests"
   ],
   "scripts": {
-    "build": "tsc && chmod +x dist/src/cli/index.js",
+    "clean": "rm -rf dist",
+    "build": "npm run clean && tsc && chmod +x dist/src/cli/index.js",
     "test": "jest --runInBand",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
@@ -88,5 +89,6 @@
     "type": "url",
     "url": "https://www.mindstudio.ai"
   },
-  "sideEffects": false
+  "sideEffects": false,
+  "type": "commonjs"
 }

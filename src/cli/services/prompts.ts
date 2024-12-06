@@ -1,5 +1,5 @@
 import inquirer from "inquirer";
-import { Config } from "@core/config/types";
+import { Config } from "../../core/config/types";
 
 export class Prompts {
   async selectWorkerAndWorkflow(config: Config): Promise<{

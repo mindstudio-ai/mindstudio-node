@@ -1,10 +1,10 @@
 import { Command } from "commander";
 
-import { ConfigManager } from "@core/config/manager";
 import { SyncCommand, TestCommand } from "./commands";
 import { TypeGenerator } from "./services/generator";
 import { Prompts } from "./services/prompts";
 import { ListCommand } from "./commands/list";
+import { ConfigManager } from "../core/config/manager";
 
 export class CLI {
   constructor(
@@ -22,12 +22,13 @@ export class CLI {
     this.program.name("mindstudio").description("MindStudio CLI");
 
     if (!this.program.opts().version) {
-      this.program.version(require("../../package.json").version);
+      this.program.version(require("../../../package.json").version);
     }
 
     this.program
       .option("--base-url <url>", "Override API base URL")
-      .option("--key <apiKey>", "Override API key");
+      .option("--key <apiKey>", "Override API key")
+      .option("-v, --verbose", "Enable verbose logging");
 
     const syncCmd = new SyncCommand(this.configManager, this.typeGenerator);
     const testCmd = new TestCommand(this.configManager, this.prompts);
@@ -36,13 +37,13 @@ export class CLI {
     this.program
       .command("sync")
       .description("Initialize workspace and manage type definitions")
-      .option("--key <apiKey>", "MindStudio API key")
-      .option("--base-url <url>", "API base URL")
       .option(
         "--offline",
         "Generate types from existing config without API calls"
       )
-      .action((options) => syncCmd.execute(options));
+      .action((options) =>
+        syncCmd.execute({ ...this.program.opts(), ...options })
+      );
 
     this.program
       .command("test")
@@ -50,14 +51,16 @@ export class CLI {
       .option("--worker <worker>", "Worker name")
       .option("--workflow <workflow>", "Workflow name")
       .option("--input <input>", "Input JSON string")
-      .action((options) => testCmd.execute(options));
+      .action((options) =>
+        testCmd.execute({ ...this.program.opts(), ...options })
+      );
 
     this.program
       .command("list")
       .description("List available workers and their workflows")
-      .option("--key <apiKey>", "MindStudio API key")
-      .option("--base-url <url>", "API base URL")
-      .action((options) => listCmd.execute(options));
+      .action((options) =>
+        listCmd.execute({ ...this.program.opts(), ...options })
+      );
   }
 
   public async run(args: string[]): Promise<void> {
