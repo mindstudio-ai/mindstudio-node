@@ -13,4 +13,3 @@ cli.run(process.argv).catch((error) => {
 
 export * from "./cli";
 export * from "./types";
-export * from "./config";

@@ -1,6 +1,6 @@
-import { HttpClient } from "@internal/http/client";
-import { HttpClientConfig, WorkflowExecutionResponse } from "@internal/types";
-import { WorkerLoader } from "@internal/workers/loader";
+import { HttpClient } from "@core/http/client";
+import { HttpClientConfig, WorkflowExecutionResponse } from "@core/types";
+import { WorkerLoader } from "@core/workers/loader";
 import { MindStudioWorkers } from "@generated/workers";
 import { MindStudioError } from "./errors";
 import { WorkflowResponse } from "./types";

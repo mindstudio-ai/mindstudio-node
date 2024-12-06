@@ -4,10 +4,9 @@ export default {
   setupFilesAfterEnv: ["<rootDir>/tests/jest.setup.ts"],
   testMatch: ["<rootDir>/tests/**/*.test.ts"],
   moduleNameMapper: {
-    "^@internal/(.*)$": "<rootDir>/src/internal/$1",
-    "^@public/(.*)$": "<rootDir>/src/public/$1",
+    "^@core/(.*)$": "<rootDir>/src/core/$1",
+    "^@mindstudio/(.*)$": "<rootDir>/src/$1",
     "^@cli/(.*)$": "<rootDir>/src/cli/$1",
-    "^@test-utils/(.*)$": "<rootDir>/tests/utils/$1",
   },
   collectCoverageFrom: [
     "src/public/**/*.ts",

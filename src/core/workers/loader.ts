@@ -1,7 +1,9 @@
-import { ConfigManager } from "@cli/config";
-import { WorkflowResponse, WorkflowFunction } from "@public/types";
+import { ConfigManager } from "@core/config/manager";
+import { WorkflowResponse, WorkflowFunction } from "../../types";
 import { MindStudioWorkers } from "@generated/workers";
 import { MSWorker, MSWorkflow, MSVariables } from "./types";
+import { Config } from "@core/config/types";
+import { Worker, Workflow } from "@core/types";
 
 type RunFunction = (params: {
   workerId: string;
@@ -10,19 +12,40 @@ type RunFunction = (params: {
 }) => Promise<WorkflowResponse<any>>;
 
 export class WorkerLoader {
+  private configManager = new ConfigManager();
+
   constructor(private runFn: RunFunction) {}
 
   loadFromConfig(): MindStudioWorkers | undefined {
     try {
-      const configManager = new ConfigManager();
-      const config = configManager.load();
-      const workers = configManager.convertToWorkerWorkflows(config);
-
+      const config = this.configManager.readConfig();
+      const workers = this.createWorkerWorkflows(config);
       return this.createWorkerFunctions(workers);
     } catch (error) {
-      // If loading fails, return undefined so client can handle appropriately
       return undefined;
     }
+  }
+
+  private createWorkerWorkflows(config: Config): MSWorker[] {
+    return config.workers.map(
+      (worker) =>
+        new Worker(
+          worker.id,
+          worker.name,
+          worker.slug,
+          worker.workflows.map(
+            (workflow) =>
+              new Workflow(
+                workflow.id,
+                workflow.name,
+                workflow.slug,
+                workflow.launchVariables,
+                workflow.outputVariables,
+                worker
+              )
+          )
+        )
+    );
   }
 
   private createWorkerFunctions(workers: MSWorker[]): MindStudioWorkers {

@@ -12,11 +12,11 @@
         "resolveJsonModule": true,
         "baseUrl": ".",
         "paths": {
-            "@internal/*": [
-                "src/internal/*"
+            "@core/*": [
+                "src/core/*"
             ],
-            "@public/*": [
-                "src/public/*"
+            "@mindstudio/*": [
+                "src/*",
             ],
             "@cli/*": [
                 "src/cli/*"

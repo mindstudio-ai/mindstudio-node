@@ -1,4 +1,4 @@
-import { Worker, Workflow } from "@internal/types";
+import { Worker, Workflow } from "@core/types";
 
 const workerData = {
   id: "test-worker-id",

@@ -1,6 +1,6 @@
-import { TestCommand } from "../../../src/cli/commands/test";
-import { ConfigManager } from "../../../src/cli/config";
-import { Prompts } from "../../../src/cli/prompts";
+import { TestCommand } from "@cli/commands/test";
+import { ConfigManager } from "@core/config/manager";
+import { Prompts } from "@cli/prompts";
 import { mockConfig } from "../../utils/mocks/config";
 import { setupApiMock } from "../../utils/mocks/api";
 import fs from "fs";

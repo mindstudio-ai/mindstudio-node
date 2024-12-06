@@ -1,8 +1,7 @@
-import { MindStudio } from "../../src/public/client";
-import { MindStudioError } from "../../src/public/errors";
+import { MindStudio } from "@mindstudio/client";
+import fs from "fs";
 import { setupApiMock } from "../utils/mocks/api";
 import { mockConfig } from "../utils/mocks/config";
-import fs from "fs";
 
 describe("MindStudio Client", () => {
   const apiMock = setupApiMock();

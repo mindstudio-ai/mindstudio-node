@@ -1,5 +1,5 @@
-import { HttpClient } from "@internal/http/client";
-import { MSWorker, MSWorkflow, Workflow, Worker } from "@internal/types";
+import { HttpClient } from "@core/http/client";
+import { MSWorker, MSWorkflow, Workflow, Worker } from "@core/types";
 
 export class WorkerDiscoveryService {
   static async fetchWorkerDefinitions(

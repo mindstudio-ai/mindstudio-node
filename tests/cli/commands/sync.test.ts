@@ -1,12 +1,11 @@
+import { ConfigManager } from "@core/config/manager";
+import { Worker, Workflow } from "@core/types";
 import fs from "fs";
-import path from "path";
-import { SyncCommand } from "../../../src/cli/commands/sync";
-import { ConfigManager } from "../../../src/cli/config";
-import { TypeGenerator } from "../../../src/cli/utils/generator";
-import { Prompts } from "../../../src/cli/prompts";
-import { WorkerDiscoveryService } from "../../../src/cli/services/worker-discovery";
+import { SyncCommand } from "@cli/commands/sync";
+import { Prompts } from "@cli/prompts";
+import { WorkerDiscoveryService } from "@cli/services/worker-discovery";
+import { TypeGenerator } from "@cli/utils/generator";
 import { mockConfig, mockWorkers } from "../../utils/mocks/config";
-import { Workflow, Worker } from "@internal/types";
 
 describe("Sync Command Integration", () => {
   const CONFIG_PATH = ".mindstudio.json";

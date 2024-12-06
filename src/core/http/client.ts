@@ -1,4 +1,4 @@
-import { MindStudioError } from "@public/errors";
+import { MindStudioError } from "@mindstudio/errors";
 import axios, { AxiosInstance } from "axios";
 import { version } from "os";
 import { HttpClientConfig } from "./types";

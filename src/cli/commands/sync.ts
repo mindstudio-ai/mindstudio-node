@@ -1,19 +1,43 @@
-import { MindStudio } from "@public/client";
-import { ConfigManager } from "../config";
+import { MindStudio } from "../../client";
+import { ConfigManager } from "@core/config/manager";
 import { Prompts } from "../prompts";
 import { WorkerDiscoveryService } from "../services/worker-discovery";
-import { TypeGenerator } from "@cli/utils/generator";
-import { SyncOptions } from "@cli/types";
+import { TypeGenerator } from "../utils/generator";
+import { SyncOptions } from "../types";
+import { Worker, Workflow } from "@core/types";
+import { Config } from "@core/config/types";
 
 export class SyncCommand {
   constructor(
-    private config: ConfigManager,
+    private configManager: ConfigManager,
     private typeGenerator: TypeGenerator,
     private prompts: Prompts
   ) {}
 
+  private convertToWorkerWorkflows(config: Config) {
+    return config.workers.map(
+      (worker) =>
+        new Worker(
+          worker.id,
+          worker.name,
+          worker.slug,
+          worker.workflows.map(
+            (workflow) =>
+              new Workflow(
+                workflow.id,
+                workflow.name,
+                workflow.slug,
+                workflow.launchVariables,
+                workflow.outputVariables,
+                worker
+              )
+          )
+        )
+    );
+  }
+
   public async execute(options: SyncOptions): Promise<void> {
-    const configExists = this.config.exists();
+    const configExists = this.configManager.exists();
     const isCI = process.env.CI === "true";
     const isOffline = options.offline || isCI;
 
@@ -22,11 +46,11 @@ export class SyncCommand {
         console.log("\n🔍 Found existing configuration");
         console.log("📝 Generating type definitions...");
 
-        const config = this.config.load();
+        const config = this.configManager.readConfig();
         const types = this.typeGenerator.generateTypes(
-          this.config.convertToWorkerWorkflows(config)
+          this.convertToWorkerWorkflows(config)
         );
-        this.config.writeTypes(types);
+        this.configManager.writeTypes(types);
 
         console.log("✨ Successfully generated type definitions");
         console.log("   Types available in: node_modules/mindstudio/types\n");
@@ -76,12 +100,12 @@ export class SyncCommand {
         })),
       };
 
-      this.config.write(config);
+      this.configManager.write(config);
       console.log("💾 Configuration saved to .mindstudio.json");
 
       console.log("📝 Generating type definitions...");
       const types = this.typeGenerator.generateTypes(workers);
-      this.config.writeTypes(types);
+      this.configManager.writeTypes(types);
 
       console.log(
         "\n✨ Success!" +

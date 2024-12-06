@@ -1,4 +1,4 @@
-import { MSWorker } from "@internal/types";
+import { MSWorker } from "@core/types";
 
 export class TypeGenerator {
   generateTypes(workers: MSWorker[]): string {

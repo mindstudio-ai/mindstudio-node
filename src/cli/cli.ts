@@ -1,13 +1,13 @@
 import { Command } from "commander";
 import { TypeGenerator } from "@cli/utils/generator";
 import { SyncCommand, TestCommand } from "./commands";
-import { ConfigManager } from "./config";
 import { Prompts } from "./prompts";
+import { ConfigManager } from "@core/config/manager";
 
 export class CLI {
   constructor(
     private program: Command = new Command(),
-    private config: ConfigManager = new ConfigManager(),
+    private configManager: ConfigManager = new ConfigManager(),
     private typeGenerator: TypeGenerator = new TypeGenerator(),
     private prompts: Prompts = new Prompts()
   ) {
@@ -28,11 +28,11 @@ export class CLI {
       .option("--key <apiKey>", "Override API key");
 
     const syncCmd = new SyncCommand(
-      this.config,
+      this.configManager,
       this.typeGenerator,
       this.prompts
     );
-    const testCmd = new TestCommand(this.config, this.prompts);
+    const testCmd = new TestCommand(this.configManager, this.prompts);
 
     this.program
       .command("sync")

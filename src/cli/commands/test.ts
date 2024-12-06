@@ -1,7 +1,7 @@
 import { TestOptions } from "@cli/types";
-import { ConfigManager } from "../config";
 import { Prompts } from "../prompts";
-import { MindStudio } from "@public/client";
+import { ConfigManager } from "@core/config/manager";
+import { MindStudio } from "@mindstudio/client";
 
 export class TestCommand {
   constructor(
@@ -11,7 +11,7 @@ export class TestCommand {
 
   public async execute(options: TestOptions): Promise<void> {
     try {
-      const config = this.config.load();
+      const config = this.config.readConfig();
       const apiKey = await this.prompts.getApiKey(options.key);
 
       if (!apiKey) {
