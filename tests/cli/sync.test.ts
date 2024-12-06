@@ -5,7 +5,7 @@ import { SyncCommand } from "@cli/commands/sync";
 import { Prompts } from "@cli/services/prompts";
 import { WorkerDiscoveryService } from "@cli/services/discovery";
 import { TypeGenerator } from "@cli/services/generator";
-import { mockConfig, mockWorkers } from "../../utils/mocks/config";
+import { mockWorkers, mockConfig } from "../__fixtures__/config";
 
 describe("Sync Command Integration", () => {
   const CONFIG_PATH = ".mindstudio.json";

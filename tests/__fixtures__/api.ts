@@ -1,7 +1,14 @@
 import axios from "axios";
 import MockAdapter from "axios-mock-adapter";
 
-export const setupApiMock = () => {
+export interface ApiMock {
+  reset: () => void;
+  mockWorkflowExecution: (response: any) => void;
+  mockWorkflowExecutionError: (error: Error) => void;
+  getHistory: () => MockAdapter["history"];
+}
+
+export const setupApiMock = (): ApiMock => {
   const mock = new MockAdapter(axios);
 
   return {

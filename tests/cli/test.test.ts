@@ -1,8 +1,8 @@
 import { TestCommand } from "@cli/commands/test";
 import { ConfigManager } from "@core/config/manager";
 import { Prompts } from "@cli/services/prompts";
-import { mockConfig } from "../../utils/mocks/config";
-import { setupApiMock } from "../../utils/mocks/api";
+import { mockConfig } from "../__fixtures__/config";
+import { setupApiMock } from "../__fixtures__/api";
 import fs from "fs";
 
 describe("Test Command Integration", () => {
