@@ -28,7 +28,9 @@ export class KeyManager {
     }
 
     // 3. Try loading from .env file
-    dotenv.config();
+    if (process.env.NODE_ENV !== "test") {
+      dotenv.config();
+    }
     if (process.env.MINDSTUDIO_KEY) {
       return process.env.MINDSTUDIO_KEY;
     }
