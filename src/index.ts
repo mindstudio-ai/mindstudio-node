@@ -1,3 +1,7 @@
 export { MindStudio } from "./client";
 export { MindStudioError } from "./errors";
-export type { WorkflowResponse, WorkflowFunction } from "./types";
+export type {
+  WorkflowResponse,
+  WorkflowFunction,
+  MindStudioWorkers,
+} from "./types";
