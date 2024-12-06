@@ -21,13 +21,13 @@ export class WorkerDiscoveryService {
         return new Worker(
           workerData.id,
           workerData.name,
-          EntityFormatter.formatWorker(workerData),
+          workerData.slug,
           workflowData.workflows.map(
             (wf) =>
               new Workflow(
                 wf.id,
                 wf.name,
-                EntityFormatter.formatWorkflow(wf),
+                wf.slug,
                 wf.launchVariables.filter((v) => v),
                 wf.outputVariables.filter((v) => v),
                 workerData
