@@ -98,7 +98,7 @@ npx mindstudio test --worker myWorker --workflow generateText --input '{"prompt"
 
 ---
 
-## Team Usage
+## 🧑‍💻 Team Usage
 
 1. **Project Owner:**
 
