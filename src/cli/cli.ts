@@ -27,7 +27,8 @@ export class CLI {
 
     this.program
       .option("--base-url <url>", "Override API base URL")
-      .option("--key <apiKey>", "Override API key");
+      .option("--key <apiKey>", "Override API key")
+      .option("-v, --verbose", "Enable verbose logging");
 
     const syncCmd = new SyncCommand(this.configManager, this.typeGenerator);
     const testCmd = new TestCommand(this.configManager, this.prompts);
@@ -42,6 +43,7 @@ export class CLI {
         "--offline",
         "Generate types from existing config without API calls"
       )
+      .option("-v, --verbose", "Enable verbose logging")
       .action((options) => syncCmd.execute(options));
 
     this.program
@@ -50,6 +52,7 @@ export class CLI {
       .option("--worker <worker>", "Worker name")
       .option("--workflow <workflow>", "Workflow name")
       .option("--input <input>", "Input JSON string")
+      .option("-v, --verbose", "Enable verbose logging")
       .action((options) => testCmd.execute(options));
 
     this.program
@@ -57,6 +60,7 @@ export class CLI {
       .description("List available workers and their workflows")
       .option("--key <apiKey>", "MindStudio API key")
       .option("--base-url <url>", "API base URL")
+      .option("-v, --verbose", "Enable verbose logging")
       .action((options) => listCmd.execute(options));
   }
 
