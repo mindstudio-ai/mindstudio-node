@@ -1,19 +1,13 @@
 export default {
   preset: "ts-jest",
   testEnvironment: "node",
-  setupFilesAfterEnv: ["<rootDir>/src/__tests__/setup/testEnv.ts"],
-  testMatch: ["**/__tests__/**/*.test.ts"],
+  setupFilesAfterEnv: ["<rootDir>/tests/jest.setup.ts"],
+  testMatch: ["<rootDir>/tests/**/*.test.ts"],
   moduleNameMapper: {
-    "^@/(.*)$": "<rootDir>/src/$1",
+    "^@core/(.*)$": "<rootDir>/src/core/$1",
+    "^@mindstudio/(.*)$": "<rootDir>/src/$1",
+    "^@cli/(.*)$": "<rootDir>/src/cli/$1",
   },
-  collectCoverageFrom: ["src/**/*.ts", "!src/**/*.d.ts", "!src/__tests__/**"],
-  watchPathIgnorePatterns: [
-    "node_modules",
-    "dist",
-    "coverage",
-    "\\.git",
-    "\\.vscode",
-  ],
-  watchman: false,
-  reporters: ["default"],
+  collectCoverageFrom: ["src/**/*.ts"],
+  watchPathIgnorePatterns: ["node_modules", "dist", "coverage"],
 };

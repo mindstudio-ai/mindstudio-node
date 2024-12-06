@@ -1,4 +1,4 @@
-import { MSWorker } from "./types";
+import { MSWorker } from "@core/types";
 
 export class TypeGenerator {
   generateTypes(workers: MSWorker[]): string {
@@ -7,7 +7,7 @@ export class TypeGenerator {
       (w) => `  ${w.toString()}: ${this.getWorkerInterfaceName(w.toString())};`
     );
 
-    return `import { WorkflowFunction } from "./types";
+    return `import { WorkflowFunction } from "../types/client";
 
 ${workerInterfaces}
 
@@ -23,25 +23,28 @@ ${workerFunctions.join("\n")}
 
         return `export interface ${interfaceName} {${worker.workflows
           .map((workflow) => {
-            // Generate input type based on launch variables
-            let inputType =
-              workflow.launchVariables.length > 0
-                ? `{ ${workflow.launchVariables.map((v) => `${v}: string`).join("; ")} }`
-                : "void";
-
-            // Generate output type based on output variables
-            let outputType =
-              workflow.outputVariables.length > 0
-                ? `{
-    ${workflow.outputVariables.map((v) => `${v}: string`).join(";\n    ")}
-  }`
-                : "string | undefined";
+            const inputType = this.generateInputType(workflow.launchVariables);
+            const outputType = this.generateOutputType(
+              workflow.outputVariables
+            );
 
             return `\n  ${workflow.toString()}: WorkflowFunction<${inputType}, ${outputType}>;`;
           })
           .join("")}\n}`;
       })
       .join("\n\n");
+  }
+
+  private generateInputType(variables: string[]): string {
+    return variables.length > 0
+      ? `{ ${variables.map((v) => `${v}: string`).join("; ")} }`
+      : "void";
+  }
+
+  private generateOutputType(variables: string[]): string {
+    return variables.length > 0
+      ? `{\n    ${variables.map((v) => `${v}: string`).join(";\n    ")}\n  }`
+      : "string | undefined";
   }
 
   private getWorkerInterfaceName(slug: string): string {

@@ -3,7 +3,7 @@ export class MindStudioError extends Error {
     message: string,
     public code: string,
     public status: number,
-    public details?: any
+    public details?: unknown
   ) {
     super(message);
     this.name = "MindStudioError";
