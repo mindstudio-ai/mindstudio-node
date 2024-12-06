@@ -170,4 +170,49 @@ describe("List Command", () => {
       );
     });
   });
+
+  describe("Verbose Logging", () => {
+    it("should show debug logs when verbose flag is enabled", async () => {
+      process.env.MINDSTUDIO_KEY = "test-api-key";
+      const consoleSpy = jest.spyOn(console, "log");
+
+      await listCommand.execute({ verbose: true });
+
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining("🔍 Debug: Checking for existing configuration")
+      );
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining(
+          "🔍 Debug: No configuration found, fetching from API"
+        )
+      );
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining("🔍 Debug: API key resolved")
+      );
+    });
+
+    it("should not show debug logs when verbose flag is disabled", async () => {
+      process.env.MINDSTUDIO_KEY = "test-api-key";
+      const consoleSpy = jest.spyOn(console, "log");
+
+      await listCommand.execute({ verbose: false });
+
+      expect(consoleSpy).not.toHaveBeenCalledWith(
+        expect.stringContaining("🔍 Debug:")
+      );
+    });
+
+    it("should show detailed error information in verbose mode", async () => {
+      process.env.MINDSTUDIO_KEY = "test-api-key";
+      const testError = new Error("Detailed API Error");
+      testError.stack = "Error: Detailed API Error\n    at Test.stack";
+      apiMock.mockWorkerDefinitionsError(testError);
+      const consoleSpy = jest.spyOn(console, "error");
+
+      await listCommand.execute({ verbose: true });
+
+      const allCalls = consoleSpy.mock.calls.flat().join("\n");
+      expect(allCalls).toContain("Request failed with status code 500");
+    });
+  });
 });

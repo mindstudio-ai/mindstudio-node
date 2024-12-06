@@ -78,7 +78,13 @@ interface WorkflowResponse<T> {
 Synchronize worker configurations and generate type definitions:
 
 ```bash
-npx mindstudio sync
+npx mindstudio sync [options]
+
+Options:
+  --key <apiKey>     Override API key
+  --base-url <url>   Override API base URL
+  --offline          Generate types from existing config without API calls
+  -v, --verbose      Enable verbose logging
 ```
 
 ### `list`
@@ -86,7 +92,12 @@ npx mindstudio sync
 List available workers and their workflows:
 
 ```bash
-npx mindstudio list
+npx mindstudio list [options]
+
+Options:
+  --key <apiKey>     Override API key
+  --base-url <url>   Override API base URL
+  -v, --verbose      Enable verbose logging
 
 # Example output:
 Available Workers:
@@ -107,8 +118,23 @@ Available Workers:
 Test a workflow:
 
 ```bash
-npx mindstudio test
+npx mindstudio test [options]
+
+Options:
+  --worker <worker>    Worker name
+  --workflow <name>    Workflow name
+  --input <json>      Input JSON string
+  --key <apiKey>      Override API key
+  --base-url <url>    Override API base URL
+  -v, --verbose       Enable verbose logging
 ```
+
+The `-v, --verbose` flag enables detailed logging for debugging purposes. When enabled, you'll see:
+
+- Configuration loading details
+- API interactions
+- Detailed error messages
+- Process steps and outcomes
 
 ---
 

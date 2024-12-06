@@ -1,5 +1,6 @@
 import { KeyManager } from "../../core/auth/keyManager";
 import { ConfigManager } from "../../core/config/manager";
+import { ConfigPaths } from "../../core/config/paths";
 import { Config } from "../../core/config/types";
 import { Worker, Workflow } from "../../core/types";
 import { WorkerDiscoveryService } from "../services/discovery";
@@ -7,11 +8,13 @@ import { TypeGenerator } from "../services/generator";
 import { SyncOptions } from "../types";
 import { BaseCommand } from "./base";
 
-export class SyncCommand implements BaseCommand {
+export class SyncCommand extends BaseCommand {
   constructor(
     private configManager: ConfigManager,
     private typeGenerator: TypeGenerator
-  ) {}
+  ) {
+    super();
+  }
 
   private convertToWorkerWorkflows(config: Config) {
     return config.workers.map(
@@ -40,12 +43,22 @@ export class SyncCommand implements BaseCommand {
     const isCI = process.env.CI === "true";
     const isOffline = options.offline || isCI;
 
+    this.logDebug(`Config exists: ${configExists}`, options);
+    this.logDebug(`CI environment: ${isCI}`, options);
+    this.logDebug(`Offline mode: ${isOffline}`, options);
+
     if (configExists && isOffline) {
       try {
         console.log("\n🔍 Found existing configuration");
+        this.logDebug(`Config path: ${ConfigPaths.getConfigPath()}`, options);
         console.log("📝 Generating type definitions...");
 
         const config = this.configManager.readConfig();
+        this.logDebug(
+          `Found ${config.workers.length} workers in config`,
+          options
+        );
+
         const types = this.typeGenerator.generateTypes(
           this.convertToWorkerWorkflows(config)
         );
@@ -55,7 +68,12 @@ export class SyncCommand implements BaseCommand {
         console.log("   Types available in: node_modules/mindstudio/types\n");
         return;
       } catch (error) {
-        console.error("\n❌ Failed to generate types:", error);
+        console.error("\n❌ Failed to generate types:");
+        if (options.verbose) {
+          console.error(error);
+        } else {
+          console.error(error instanceof Error ? error.message : String(error));
+        }
         console.error("   Try running with full sync: npx mindstudio sync\n");
         return;
       }

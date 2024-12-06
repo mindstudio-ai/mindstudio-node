@@ -4,30 +4,46 @@ import { WorkerDiscoveryService } from "../services/discovery";
 import { Config, ListOptions } from "../types";
 import { BaseCommand } from "./base";
 
-export class ListCommand implements BaseCommand {
-  constructor(private configManager: ConfigManager) {}
+export class ListCommand extends BaseCommand {
+  constructor(private configManager: ConfigManager) {
+    super();
+  }
 
   public async execute(options: ListOptions): Promise<void> {
     try {
-      // Try to use existing config first
+      this.logDebug("Checking for existing configuration...", options);
+
       if (this.configManager.exists()) {
+        this.logDebug("Using existing configuration", options);
         const config = this.configManager.readConfig();
+        this.logDebug(
+          `Found ${config.workers.length} workers in config`,
+          options
+        );
         this.displayWorkers(config.workers);
         return;
       }
 
-      // Fallback to API if no config
+      this.logDebug("No configuration found, fetching from API", options);
       const apiKey = KeyManager.resolveKey(options.key);
+      this.logDebug("API key resolved", options);
+
       const workers = await WorkerDiscoveryService.fetchWorkerDefinitions(
         apiKey,
         options.baseUrl
       );
+      this.logDebug(`Fetched ${workers.length} workers from API`, options);
+
       this.displayWorkers(workers);
     } catch (error) {
+      console.error("\n❌ Failed to list workers:");
+      if (options.verbose) {
+        console.error(error);
+      } else {
+        console.error(error instanceof Error ? error.message : String(error));
+      }
       console.error(
-        "\n❌ Failed to list workers:" +
-          `\n   ${error instanceof Error ? error.message : String(error)}` +
-          "\n\n   Note: Run 'npx mindstudio sync' first to fetch worker definitions\n"
+        "\n   Note: Run 'npx mindstudio sync' first to fetch worker definitions\n"
       );
     }
   }
