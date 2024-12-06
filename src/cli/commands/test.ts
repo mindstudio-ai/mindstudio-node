@@ -51,10 +51,6 @@ export class TestCommand extends BaseCommand {
       console.log("\n Executing workflow...");
       const result = await client.workers[worker][workflow](input);
 
-      if (!result.success) {
-        throw result.error;
-      }
-
       console.log("\n✨ Success!");
       console.log("Result:", JSON.stringify(result, null, 2));
     } catch (error) {

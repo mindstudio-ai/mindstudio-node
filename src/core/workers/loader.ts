@@ -70,9 +70,7 @@ export class WorkerLoader {
     worker: MSWorker,
     workflow: MSWorkflow
   ): WorkflowFunction {
-    const fn = async (
-      variables?: MSVariables
-    ): Promise<WorkflowResponse<any>> => {
+    const fn = async (variables?: MSVariables) => {
       return this.runFn({
         workerId: worker.id,
         workflow: workflow.slug,

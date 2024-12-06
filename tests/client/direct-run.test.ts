@@ -24,24 +24,20 @@ describe("Direct Workflow Execution", () => {
     });
 
     expect(result).toEqual({
-      success: true,
       result: "Generated text",
       billingCost: "0.01",
     });
   });
 
-  it("should handle workflow execution errors", async () => {
+  it("should throw error when workflow execution fails", async () => {
     apiMock.mockWorkflowExecutionError(new Error("Workflow failed"));
 
-    const result = await client.run({
-      workerId: "test-worker",
-      workflow: "generateText",
-      variables: { prompt: "Hello" },
-    });
-
-    expect(result).toEqual({
-      success: false,
-      error: expect.any(Error),
-    });
+    await expect(
+      client.run({
+        workerId: "test-worker",
+        workflow: "generateText",
+        variables: { prompt: "Hello" },
+      })
+    ).rejects.toThrow("Workflow failed");
   });
 });

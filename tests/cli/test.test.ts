@@ -218,7 +218,7 @@ describe("Test Command", () => {
       });
 
       const allCalls = consoleSpy.mock.calls.flat().join("\n");
-      expect(allCalls).toContain("Network Error");
+      expect(allCalls).toContain("API execution failed");
     });
 
     it("should not show debug logs when verbose is disabled", async () => {
