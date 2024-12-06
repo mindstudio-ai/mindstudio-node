@@ -26,15 +26,25 @@ describe("Type-Safe Workflow Execution", () => {
     });
 
     const client = new MindStudio(TEST_API_KEY);
-    const result = await client.workers["test-worker"].generateText({
+    const result = await client.workers.TestWorker.generateText({
       prompt: "Hello",
     });
 
     expect(result).toEqual({
-      success: true,
       result: "Generated text",
       billingCost: "0.01",
     });
+  });
+
+  it("should throw error when workflow execution fails", async () => {
+    apiMock.mockWorkflowExecutionError(new Error("Workflow failed"));
+
+    const client = new MindStudio(TEST_API_KEY);
+    await expect(
+      client.workers.TestWorker.generateText({
+        prompt: "Hello",
+      })
+    ).rejects.toThrow("Workflow failed");
   });
 
   it("should throw error when type definitions are not available", async () => {

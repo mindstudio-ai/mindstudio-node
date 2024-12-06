@@ -40,7 +40,7 @@ export class MindStudio {
    */
   public async run(params: {
     workerId: string;
-    workflow: string;
+    workflow?: string;
     variables?: Record<string, string>;
   }): Promise<WorkflowResponse<any>> {
     try {
@@ -54,15 +54,18 @@ export class MindStudio {
       );
 
       return {
-        success: true,
         result: response.result,
         billingCost: response.billingCost,
       };
     } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error : new Error(String(error)),
-      };
+      if (error instanceof MindStudioError) {
+        throw error;
+      }
+      throw new MindStudioError(
+        error instanceof Error ? error.message : String(error),
+        "workflow_execution_failed",
+        500
+      );
     }
   }
 }

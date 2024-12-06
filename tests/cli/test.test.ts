@@ -56,15 +56,15 @@ describe("Test Command", () => {
       process.env.MINDSTUDIO_KEY = "test-api-key";
 
       await testCommand.execute({
-        worker: "test-worker",
-        workflow: "generateText",
+        worker: "test-worker-id",
+        workflow: "test-workflow-id",
         input: '{"prompt":"Test input"}',
       });
 
       const apiCalls = apiMock.getHistory().post;
       expect(JSON.parse(apiCalls[0].data)).toMatchObject({
         workerId: "test-worker-id",
-        workflow: "generateText",
+        workflow: "Generate Text",
         variables: { prompt: "Test input" },
       });
     });
@@ -74,8 +74,8 @@ describe("Test Command", () => {
       const consoleSpy = jest.spyOn(console, "error");
 
       await testCommand.execute({
-        worker: "test-worker",
-        workflow: "generateText",
+        worker: "test-worker-id",
+        workflow: "test-workflow-id",
         input: "invalid json",
       });
 
@@ -90,8 +90,8 @@ describe("Test Command", () => {
       process.env.MINDSTUDIO_KEY = "test-api-key";
 
       jest.spyOn(prompts, "selectWorkerAndWorkflow").mockResolvedValue({
-        worker: "test-worker",
-        workflow: "generateText",
+        worker: "test-worker-id",
+        workflow: "test-workflow-id",
       });
       jest.spyOn(prompts, "getWorkflowInput").mockResolvedValue({
         prompt: "Interactive input",
@@ -218,7 +218,7 @@ describe("Test Command", () => {
       });
 
       const allCalls = consoleSpy.mock.calls.flat().join("\n");
-      expect(allCalls).toContain("Network Error");
+      expect(allCalls).toContain("API execution failed");
     });
 
     it("should not show debug logs when verbose is disabled", async () => {

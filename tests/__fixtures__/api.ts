@@ -19,7 +19,10 @@ export const setupApiMock = (): ApiMock => {
       mock.onPost("/workers/run").reply(200, response);
     },
     mockWorkflowExecutionError: (error: Error) => {
-      mock.onPost("/workers/run").networkError();
+      mock.onPost("/workers/run").reply(400, {
+        message: error.message,
+        code: "workflow_error",
+      });
     },
     mockWorkerDefinitions: (workers: any[]) => {
       mock.onGet("/workers/load").reply(200, {

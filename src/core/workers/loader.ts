@@ -5,6 +5,7 @@ import {
 } from "../../types";
 import { ConfigManager } from "../config/manager";
 import { Config } from "../config/types";
+import { EntityFormatter } from "../utils/nameFormatter";
 import { MSWorker, Workflow, MSWorkflow, MSVariables, Worker } from "./types";
 
 type RunFunction = (params: {
@@ -52,12 +53,10 @@ export class WorkerLoader {
 
   private createWorkerFunctions(workers: MSWorker[]): MindStudioWorkers {
     return workers.reduce((acc, worker) => {
-      acc[worker.slug] = worker.workflows.reduce(
+      acc[EntityFormatter.formatWorker(worker)] = worker.workflows.reduce(
         (workflowAcc, workflow) => {
-          workflowAcc[workflow.slug] = this.createWorkflowFunction(
-            worker,
-            workflow
-          );
+          workflowAcc[EntityFormatter.formatWorkflow(workflow)] =
+            this.createWorkflowFunction(worker, workflow);
           return workflowAcc;
         },
         {} as Record<string, WorkflowFunction>
@@ -70,12 +69,10 @@ export class WorkerLoader {
     worker: MSWorker,
     workflow: MSWorkflow
   ): WorkflowFunction {
-    const fn = async (
-      variables?: MSVariables
-    ): Promise<WorkflowResponse<any>> => {
+    const fn = async (variables?: MSVariables) => {
       return this.runFn({
         workerId: worker.id,
-        workflow: workflow.slug,
+        workflow: workflow.name,
         variables: variables || {},
       });
     };
