@@ -1,7 +1,9 @@
 {
     "compilerOptions": {
         "target": "es2019",
-        "module": "commonjs",
+        "module": "es2015",
+        "moduleResolution": "node",
+        "allowJs": true,
         "declaration": true,
         "declarationDir": "./dist",
         "outDir": "./dist",
@@ -13,7 +15,7 @@
         "esModuleInterop": true,
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
-        "resolveJsonModule": true,
+        "resolveJsonModule": true
     },
     "include": [
         "src/**/*",
