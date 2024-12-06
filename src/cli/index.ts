@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 import dotenv from "dotenv";
 import { CLI } from "./cli";
 
