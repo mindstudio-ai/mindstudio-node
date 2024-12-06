@@ -1,11 +1,14 @@
 {
     "compilerOptions": {
         "target": "es2019",
-        "module": "esnext",
-        "moduleResolution": "node",
+        "module": "commonjs",
         "declaration": true,
         "declarationDir": "./dist",
         "outDir": "./dist",
+        "rootDirs": [
+            "./src",
+            "./tests"
+        ],
         "strict": true,
         "esModuleInterop": true,
         "skipLibCheck": true,
