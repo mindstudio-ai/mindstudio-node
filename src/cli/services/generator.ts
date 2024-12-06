@@ -8,7 +8,7 @@ export class TypeGenerator {
   ${w.toString()}: ${this.getWorkerInterfaceName(w.toString())};`
     );
 
-    return `import { WorkflowFunction } from "../types/client";
+    return `import { WorkflowFunction } from "../types";
 
 /**
  * Available MindStudio Workers
