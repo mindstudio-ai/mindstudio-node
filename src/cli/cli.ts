@@ -1,8 +1,9 @@
 import { Command } from "commander";
-import { TypeGenerator } from "@cli/utils/generator";
-import { SyncCommand, TestCommand } from "./commands";
-import { Prompts } from "./prompts";
+
 import { ConfigManager } from "@core/config/manager";
+import { SyncCommand, TestCommand } from "./commands";
+import { TypeGenerator } from "./services/generator";
+import { Prompts } from "./services/prompts";
 
 export class CLI {
   constructor(

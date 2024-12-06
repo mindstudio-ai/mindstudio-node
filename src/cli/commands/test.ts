@@ -1,9 +1,10 @@
 import { TestOptions } from "@cli/types";
-import { Prompts } from "../prompts";
 import { ConfigManager } from "@core/config/manager";
 import { MindStudio } from "@mindstudio/client";
+import { Prompts } from "../services/prompts";
+import { BaseCommand } from "./base";
 
-export class TestCommand {
+export class TestCommand implements BaseCommand {
   constructor(
     private config: ConfigManager,
     private prompts: Prompts

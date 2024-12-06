@@ -2,9 +2,9 @@ import { ConfigManager } from "@core/config/manager";
 import { Worker, Workflow } from "@core/types";
 import fs from "fs";
 import { SyncCommand } from "@cli/commands/sync";
-import { Prompts } from "@cli/prompts";
-import { WorkerDiscoveryService } from "@cli/services/worker-discovery";
-import { TypeGenerator } from "@cli/utils/generator";
+import { Prompts } from "@cli/services/prompts";
+import { WorkerDiscoveryService } from "@cli/services/discovery";
+import { TypeGenerator } from "@cli/services/generator";
 import { mockConfig, mockWorkers } from "../../utils/mocks/config";
 
 describe("Sync Command Integration", () => {
