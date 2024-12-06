@@ -4,6 +4,7 @@ import { ConfigManager } from "@core/config/manager";
 import { SyncCommand, TestCommand } from "./commands";
 import { TypeGenerator } from "./services/generator";
 import { Prompts } from "./services/prompts";
+import { ListCommand } from "./commands/list";
 
 export class CLI {
   constructor(
@@ -30,6 +31,7 @@ export class CLI {
 
     const syncCmd = new SyncCommand(this.configManager, this.typeGenerator);
     const testCmd = new TestCommand(this.configManager, this.prompts);
+    const listCmd = new ListCommand(this.configManager);
 
     this.program
       .command("sync")
@@ -49,6 +51,13 @@ export class CLI {
       .option("--workflow <workflow>", "Workflow name")
       .option("--input <input>", "Input JSON string")
       .action((options) => testCmd.execute(options));
+
+    this.program
+      .command("list")
+      .description("List available workers and their workflows")
+      .option("--key <apiKey>", "MindStudio API key")
+      .option("--base-url <url>", "API base URL")
+      .action((options) => listCmd.execute(options));
   }
 
   public async run(args: string[]): Promise<void> {

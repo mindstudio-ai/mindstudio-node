@@ -6,6 +6,7 @@ export interface ApiMock {
   mockWorkflowExecution: (response: any) => void;
   mockWorkflowExecutionError: (error: Error) => void;
   mockWorkerDefinitions: (workers: any[]) => void;
+  mockWorkerDefinitionsError: (error: Error) => void;
   getHistory: () => MockAdapter["history"];
 }
 
@@ -34,6 +35,9 @@ export const setupApiMock = (): ApiMock => {
           workflows: worker.workflows,
         });
       });
+    },
+    mockWorkerDefinitionsError: (error: Error) => {
+      mock.onGet("/workers/load").reply(500, error);
     },
     getHistory: () => mock.history,
   };

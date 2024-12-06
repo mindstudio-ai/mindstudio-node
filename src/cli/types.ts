@@ -27,3 +27,8 @@ export interface Config {
     }>;
   }>;
 }
+
+export interface ListOptions {
+  key?: string;
+  baseUrl?: string;
+}
