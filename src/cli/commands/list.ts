@@ -1,5 +1,6 @@
 import { KeyManager } from "../../core/auth/keyManager";
 import { ConfigManager } from "../../core/config/manager";
+import { EntityFormatter } from "../../core/utils/nameFormatter";
 import { WorkerDiscoveryService } from "../services/discovery";
 import { Config, ListOptions } from "../types";
 import { BaseCommand } from "./base";
@@ -44,24 +45,37 @@ export class ListCommand extends BaseCommand {
   }
 
   private displayWorkers(workers: Array<Config["workers"][0]>): void {
-    console.log("\nAvailable Workers:\n");
+    console.log("\n📦 Available Workers\n");
 
     workers.forEach((worker) => {
-      console.log(`• ${worker.name} (${worker.slug})`);
+      const formattedWorkerName = EntityFormatter.formatWorker(worker);
+      console.log(`\x1b[1m${worker.name}\x1b[0m`);
+      console.log(`Import: workers.${formattedWorkerName}\n`);
+
       worker.workflows.forEach((workflow) => {
-        console.log(`  └─ ${workflow.name} (${workflow.slug})`);
-        if (workflow.launchVariables.length) {
-          console.log(`     ├─ Input: ${workflow.launchVariables.join(", ")}`);
-        }
-        if (workflow.outputVariables.length) {
-          console.log(`     └─ Output: ${workflow.outputVariables.join(", ")}`);
-        }
+        const formattedWorkflowName = EntityFormatter.formatWorkflow(workflow);
+        console.log(`  🔹 ${workflow.name}`);
+
+        // Create function signature
+        const inputs = workflow.launchVariables.length
+          ? `{ ${workflow.launchVariables.join(", ")} }`
+          : "";
+        console.log(
+          `    └─ workers.${formattedWorkerName}.${formattedWorkflowName}(${inputs})`
+        );
+
+        // Show return type
+        const returns = workflow.outputVariables.length
+          ? `{ ${workflow.outputVariables.join(", ")} }`
+          : "string | undefined";
+        console.log(`       Returns: ${returns}`);
+        console.log(""); // Add spacing between workflows
       });
-      console.log("");
+      console.log("─".repeat(50) + "\n"); // Add separator between workers
     });
 
     console.log(
-      "Run 'npx mindstudio sync' to generate type definitions for these workers\n"
+      "💡 Run 'npx mindstudio sync' to generate type definitions for these workers\n"
     );
   }
 }

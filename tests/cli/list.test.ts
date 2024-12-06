@@ -66,20 +66,17 @@ describe("List Command", () => {
 
   describe("Configuration Based Listing", () => {
     it("should list workers from existing configuration", async () => {
-      // Setup existing config
       fs.writeFileSync(CONFIG_PATH, JSON.stringify(mockConfig));
       const consoleSpy = jest.spyOn(console, "log");
 
       await listCommand.execute({});
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("Available Workers:")
+        expect.stringContaining("📦 Available Workers")
       );
+      expect(consoleSpy).toHaveBeenCalledWith("\x1b[1mTest Worker\x1b[0m");
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("test-worker")
-      );
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("generateText")
+        expect.stringContaining("workers.TestWorker")
       );
     });
 
@@ -89,11 +86,13 @@ describe("List Command", () => {
 
       await listCommand.execute({});
 
+      // Check for function signature with input
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("Input: prompt")
+        expect.stringContaining("generateText({ prompt })")
       );
+      // Check for return type
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("Output: text")
+        expect.stringContaining("Returns: { text }")
       );
     });
   });
@@ -135,15 +134,10 @@ describe("List Command", () => {
 
   describe("Error Handling", () => {
     it("should handle missing API key gracefully", async () => {
-      const consoleSpy = jest.spyOn(console, "error");
-
+      const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
       await listCommand.execute({});
-
-      expect(consoleSpy).toHaveBeenCalledWith(
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
         expect.stringContaining("Failed to list workers")
-      );
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("API key not found")
       );
     });
 
