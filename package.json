@@ -1,6 +1,6 @@
 {
   "name": "mindstudio",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Client library for MindStudio AI Workers",
   "author": "MindStudio AI <support@mindstudio.ai> (https://www.mindstudio.ai)",
   "license": "MIT",
@@ -59,7 +59,7 @@
     "prepublishOnly": "npm run test && npm run build",
     "prepare": "npm run build",
     "preversion": "npm run test",
-    "version": "npm run build && git add -A dist",
+    "version": "npm run build && git add -f -A dist",
     "postversion": "git push && git push --tags",
     "security-check": "npm audit && snyk test"
   },
