@@ -10,10 +10,25 @@
         "esModuleInterop": true,
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
-        "resolveJsonModule": true
+        "resolveJsonModule": true,
+        "baseUrl": ".",
+        "paths": {
+            "@internal/*": [
+                "src/internal/*"
+            ],
+            "@public/*": [
+                "src/public/*"
+            ],
+            "@cli/*": [
+                "src/cli/*"
+            ],
+            "@generated/*": [
+                "src/generated/*"
+            ]
+        }
     },
     "include": [
-        "src/**/*"
+        "src/**/*",
     ],
     "exclude": [
         "node_modules",

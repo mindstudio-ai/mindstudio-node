@@ -37,7 +37,13 @@
     "mindstudio": "./dist/cli/index.js"
   },
   "files": [
-    "dist",
-    "types"
-  ]
+    "dist/public",
+    "dist/cli"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/public/index.d.ts",
+      "default": "./dist/public/index.js"
+    }
+  }
 }

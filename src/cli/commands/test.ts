@@ -1,14 +1,7 @@
 import { MindStudio } from "../../client/client";
 import { ConfigManager } from "../config";
 import { Prompts } from "../prompts";
-
-interface TestOptions {
-  worker?: string;
-  workflow?: string;
-  input?: string;
-  key?: string;
-  baseUrl?: string;
-}
+import { TestOptions } from "@internal/types";
 
 export class TestCommand {
   constructor(

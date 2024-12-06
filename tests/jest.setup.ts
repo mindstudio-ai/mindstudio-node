@@ -2,13 +2,7 @@ import dotenv from "dotenv";
 import path from "path";
 
 // Load test environment variables
-const result = dotenv.config({
-  path: path.join(__dirname, "../.env.test"),
-});
-
-if (result.error) {
-  console.warn("Failed to load test environment variables:", result.error);
-}
+dotenv.config({ path: path.join(__dirname, ".env.test") });
 
 // Set default test API key if not provided
 if (!process.env.MINDSTUDIO_KEY) {

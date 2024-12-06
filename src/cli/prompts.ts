@@ -1,6 +1,5 @@
 import inquirer from "inquirer";
-import { Config } from "./config";
-
+import { Config } from "./types";
 export class Prompts {
   async getApiKey(existingKey?: string): Promise<string> {
     if (existingKey) {

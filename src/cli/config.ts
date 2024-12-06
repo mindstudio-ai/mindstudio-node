@@ -1,23 +1,8 @@
 import * as fs from "fs";
 import path from "path";
-import { MSWorker, Worker, Workflow } from "../types";
-import { MindStudio } from "../client/client";
-
-export interface Config {
-  version: string;
-  workers: {
-    id: string;
-    name: string;
-    slug: string;
-    workflows: {
-      id: string;
-      name: string;
-      slug: string;
-      launchVariables: string[];
-      outputVariables: string[];
-    }[];
-  }[];
-}
+import { MSWorker, Worker, Workflow } from "@internal/types";
+import { MindStudio } from "@public/client";
+import { Config } from "./types";
 
 export class ConfigManager {
   write(config: Config): void {

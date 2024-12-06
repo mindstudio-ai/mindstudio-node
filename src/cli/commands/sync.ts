@@ -1,14 +1,9 @@
-import { MindStudio } from "../../client/client";
-import { TypeGenerator } from "../../codegen";
+import { MindStudio } from "@public/client";
 import { ConfigManager } from "../config";
 import { Prompts } from "../prompts";
 import { WorkerDiscoveryService } from "../services/worker-discovery";
-
-interface SyncOptions {
-  key?: string;
-  baseUrl?: string;
-  offline?: boolean;
-}
+import { TypeGenerator } from "@cli/utils/generator";
+import { SyncOptions } from "@cli/types";
 
 export class SyncCommand {
   constructor(

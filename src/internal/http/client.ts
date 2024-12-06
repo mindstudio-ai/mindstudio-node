@@ -1,7 +1,7 @@
+import { MindStudioError } from "@public/errors";
 import axios, { AxiosInstance } from "axios";
-import { version } from "../../package.json";
-import { MindStudioError } from "../errors";
-import { HttpClientConfig, WorkflowExecutionResponse } from "./types";
+import { version } from "os";
+import { HttpClientConfig } from "./types";
 
 export class HttpClient {
   private readonly http: AxiosInstance;

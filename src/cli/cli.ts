@@ -1,5 +1,5 @@
 import { Command } from "commander";
-import { TypeGenerator } from "../codegen";
+import { TypeGenerator } from "@cli/utils/generator";
 import { SyncCommand, TestCommand } from "./commands";
 import { ConfigManager } from "./config";
 import { Prompts } from "./prompts";

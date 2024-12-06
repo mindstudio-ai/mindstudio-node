@@ -1,9 +1,9 @@
-import { MindStudioError } from "../errors";
-import { MindStudioWorkers } from "../generated";
-import { WorkflowResponse } from "../types";
-import { HttpClient } from "./http-client";
-import { HttpClientConfig, WorkflowExecutionResponse } from "./types";
-import { WorkerLoader } from "./worker-loader";
+import { HttpClient } from "@internal/http/client";
+import { HttpClientConfig, WorkflowExecutionResponse } from "@internal/types";
+import { WorkerLoader } from "@internal/workers/loader";
+import { MindStudioWorkers } from "@generated/workers";
+import { MindStudioError } from "./errors";
+import { WorkflowResponse } from "./types";
 
 export class MindStudio {
   private readonly httpClient: HttpClient;

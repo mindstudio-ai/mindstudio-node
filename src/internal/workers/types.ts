@@ -1,4 +1,4 @@
-import { EntityFormatter } from "../shared/utils/nameFormatter";
+import { EntityFormatter } from "@internal/utils/nameFormatter";
 
 // Runtime types for workflow execution
 export interface MSVariables {

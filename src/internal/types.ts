@@ -1,5 +1,5 @@
-export * from "./worker";
-export * from "./client";
+export * from "./workers/types";
+export * from "./http/types";
 
 // Environment type declarations
 declare global {

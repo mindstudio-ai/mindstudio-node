@@ -1,13 +1,7 @@
-import { ConfigManager } from "../cli/config";
-import { MindStudioError } from "../errors";
-import {
-  MSVariables,
-  MSWorker,
-  MSWorkflow,
-  WorkflowFunction,
-  WorkflowResponse,
-} from "../types";
-import { MindStudioWorkers } from "../generated";
+import { ConfigManager } from "@cli/config";
+import { WorkflowResponse, WorkflowFunction } from "@public/types";
+import { MindStudioWorkers } from "@generated/workers";
+import { MSWorker, MSWorkflow, MSVariables } from "./types";
 
 type RunFunction = (params: {
   workerId: string;
