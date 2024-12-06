@@ -1,6 +1,6 @@
 {
   "name": "mindstudio",
-  "version": "0.7.10-3",
+  "version": "0.7.10-4",
   "description": "Client library for MindStudio AI Workers",
   "author": "MindStudio AI <support@mindstudio.ai> (https://www.mindstudio.ai)",
   "license": "MIT",
