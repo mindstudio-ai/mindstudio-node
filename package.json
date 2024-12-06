@@ -5,6 +5,11 @@
   "author": "MindStudio AI <support@mindstudio.ai> (https://www.mindstudio.ai)",
   "license": "MIT",
   "homepage": "https://www.mindstudio.ai",
+  "links": {
+    "npm": "https://www.npmjs.com/package/mindstudio",
+    "homepage": "https://www.mindstudio.ai",
+    "repository": "https://github.com/mindstudio-ai/mindstudio-node"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mindstudio-ai/mindstudio-node.git"
