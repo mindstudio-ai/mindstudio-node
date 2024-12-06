@@ -182,4 +182,64 @@ describe("Sync Command", () => {
       expect(fs.existsSync(CONFIG_PATH)).toBeTruthy();
     });
   });
+
+  describe("Type Generation", () => {
+    beforeEach(() => {
+      // Create types directory
+      if (!fs.existsSync(TYPES_PATH)) {
+        fs.mkdirSync(TYPES_PATH, { recursive: true });
+      }
+    });
+
+    it("should generate correct type definitions with JSDoc comments", async () => {
+      process.env.MINDSTUDIO_KEY = "test-key";
+      await syncCommand.execute({});
+
+      const types = fs.readFileSync(`${TYPES_PATH}/workers.d.ts`, "utf-8");
+
+      // Check header
+      expect(types).toContain("* Available MindStudio Workers");
+      expect(types).toContain("* Run 'npx mindstudio list'");
+
+      // Check worker documentation
+      expect(types).toContain("/** Test Worker */");
+
+      // Check workflow documentation
+      expect(types).toContain("* Test Workflow");
+      expect(types).toContain("* @param input.prompt - Input variable");
+      expect(types).toContain("* @returns result.result - Output variable");
+
+      // Check type definitions
+      expect(types).toContain("export interface TestWorkerWorker {");
+      expect(types).toContain("testWorkflow: WorkflowFunction<");
+      expect(types).toContain("{ prompt: string }");
+      expect(types).toContain("result: string");
+    });
+
+    it("should handle workers with no variables", async () => {
+      // Mock worker with no variables
+      apiMock.mockWorkerDefinitions([
+        {
+          id: "test-id",
+          name: "Empty Worker",
+          slug: "empty-worker",
+          workflows: [
+            {
+              id: "wf-id",
+              name: "Empty Workflow",
+              slug: "empty",
+              launchVariables: [],
+              outputVariables: [],
+            },
+          ],
+        },
+      ]);
+
+      process.env.MINDSTUDIO_KEY = "test-key";
+      await syncCommand.execute({});
+
+      const types = fs.readFileSync(`${TYPES_PATH}/workers.d.ts`, "utf-8");
+      expect(types).toContain("EmptyWorker: EmptyWorkerWorker");
+    });
+  });
 });
