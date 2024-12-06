@@ -7,8 +7,8 @@
   "homepage": "https://www.mindstudio.ai",
   "links": {
     "npm": "https://www.npmjs.com/package/mindstudio",
-    "homepage": "https://www.mindstudio.ai",
-    "repository": "https://github.com/mindstudio-ai/mindstudio-node"
+    "github": "https://github.com/mindstudio-ai/mindstudio-node/packages",
+    "homepage": "https://www.mindstudio.ai"
   },
   "repository": {
     "type": "git",
@@ -61,7 +61,7 @@
     "preversion": "npm run test",
     "version": "npm run build && git add -f -A dist",
     "postversion": "git push && git push --tags",
-    "security-check": "npm audit && snyk test"
+    "publish:all": "npm publish && npm publish --registry https://npm.pkg.github.com"
   },
   "dependencies": {
     "axios": "^1.7.7",
@@ -84,7 +84,9 @@
     "node": ">=16.0.0"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://registry.npmjs.org/",
+    "@mindstudio-ai:registry": "https://npm.pkg.github.com"
   },
   "volta": {
     "node": "18.x"

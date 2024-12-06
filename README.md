@@ -75,37 +75,39 @@ interface WorkflowResponse<T> {
 
 ### `sync`
 
-Generate type definitions for type-safe usage:
+Synchronize worker configurations and generate type definitions:
 
 ```bash
-# With API key in environment
 npx mindstudio sync
-
-# With explicit API key
-npx mindstudio sync --key your-api-key
-
-# From existing config (CI environments)
-npx mindstudio sync --offline
-```
-
-### `test`
-
-Test a workflow from the command line:
-
-```bash
-npx mindstudio test --worker myWorker --workflow generateText --input '{"prompt":"Hello"}'
 ```
 
 ### `list`
 
-List available workers and workflows:
+List available workers and their workflows:
 
 ```bash
-# List from existing configuration
 npx mindstudio list
 
-# List from API (if no configuration exists)
-npx mindstudio list --key your-api-key
+# Example output:
+Available Workers:
+
+• Text Generator (textGenerator)
+  └─ Generate Text (generateText)
+     ├─ Input: prompt
+     └─ Output: text
+
+• Image Generator (imageGenerator)
+  └─ Create Image (createImage)
+     ├─ Input: description, style
+     └─ Output: imageUrl
+```
+
+### `test`
+
+Test a workflow:
+
+```bash
+npx mindstudio test
 ```
 
 ---
