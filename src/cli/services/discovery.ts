@@ -1,5 +1,6 @@
 import { HttpClient } from "../../core/http/client";
 import { MSWorker, MSWorkflow, Workflow, Worker } from "../../core/types";
+import { EntityFormatter } from "../../core/utils/nameFormatter";
 
 export class WorkerDiscoveryService {
   static async fetchWorkerDefinitions(
@@ -20,15 +21,15 @@ export class WorkerDiscoveryService {
         return new Worker(
           workerData.id,
           workerData.name,
-          workerData.slug,
+          EntityFormatter.formatWorker(workerData),
           workflowData.workflows.map(
             (wf) =>
               new Workflow(
                 wf.id,
                 wf.name,
-                wf.slug,
-                wf.launchVariables,
-                wf.outputVariables,
+                EntityFormatter.formatWorkflow(wf),
+                wf.launchVariables.filter((v) => v),
+                wf.outputVariables.filter((v) => v),
                 workerData
               )
           )
