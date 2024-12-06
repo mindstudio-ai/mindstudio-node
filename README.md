@@ -131,10 +131,25 @@ Optional: Add to `package.json` for automatic type generation:
 
 ### Environment Variables
 
+MindStudio requires an API key for authentication. You can provide it in several ways:
+
 ```env
+# Option 1: In your shell
+export MINDSTUDIO_KEY=your-api-key
+
+# Option 2: In your .env file
 MINDSTUDIO_KEY=your-api-key
 MINDSTUDIO_BASE_URL=https://custom-api-endpoint.com  # Optional
+
+# Option 3: Pass directly to CLI commands
+npx mindstudio sync --key your-api-key
 ```
+
+For security best practices:
+
+- Never commit API keys to version control
+- Add `.env` to your `.gitignore`
+- Use environment variables in CI/CD environments
 
 ### TypeScript Configuration
 
@@ -185,11 +200,15 @@ try {
 3. **"Failed to load configuration"**  
    Run `npx mindstudio sync` to create initial configuration
 
+---
+
 ## ✨ Best Practices
 
-1. **Environment Variables**
+1. **API Key Security**
    - Store API keys in environment variables
-   - Add `.env` to `.gitignore`
+   - Use `.env` files only for local development
+   - Never commit API keys to version control
+   - Use secure environment variables in CI/CD
 
 2. **Type Safety**
    - Use the type-safe pattern when possible

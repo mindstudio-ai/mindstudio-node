@@ -2,22 +2,6 @@ import inquirer from "inquirer";
 import { Config } from "@core/config/types";
 
 export class Prompts {
-  async getApiKey(existingKey?: string): Promise<string> {
-    if (existingKey) {
-      return existingKey;
-    }
-
-    const { apiKey } = await inquirer.prompt([
-      {
-        type: "input",
-        name: "apiKey",
-        message: "Enter your MindStudio API key:",
-        validate: (input) => input.length > 0,
-      },
-    ]);
-    return apiKey;
-  }
-
   async selectWorkerAndWorkflow(config: Config): Promise<{
     worker: string;
     workflow: string;

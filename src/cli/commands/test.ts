@@ -3,6 +3,7 @@ import { ConfigManager } from "@core/config/manager";
 import { MindStudio } from "@mindstudio/client";
 import { Prompts } from "../services/prompts";
 import { BaseCommand } from "./base";
+import { KeyManager } from "@core/auth/keyManager";
 
 export class TestCommand implements BaseCommand {
   constructor(
@@ -13,14 +14,7 @@ export class TestCommand implements BaseCommand {
   public async execute(options: TestOptions): Promise<void> {
     try {
       const config = this.config.readConfig();
-      const apiKey = await this.prompts.getApiKey(options.key);
-
-      if (!apiKey) {
-        console.error(
-          "No API key provided. Set MINDSTUDIO_KEY in your environment or .env file"
-        );
-        return;
-      }
+      const apiKey = KeyManager.resolveKey(options.key);
 
       const client = new MindStudio(apiKey, {
         baseUrl: options.baseUrl,
@@ -44,11 +38,12 @@ export class TestCommand implements BaseCommand {
       console.log("Result:", JSON.stringify(result, null, 2));
     } catch (error) {
       if (error instanceof SyntaxError) {
-        console.error("Invalid JSON input:", error.message);
+        console.error("Invalid JSON input:\n" + error.message);
+      } else if (error instanceof Error) {
+        console.error("Test failed:\n" + error.message);
       } else {
         console.error("Test failed:", error);
       }
-      console.error("This will not affect your application runtime.");
     }
   }
 }

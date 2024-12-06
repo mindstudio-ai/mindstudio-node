@@ -1,17 +1,22 @@
 import { HttpClient } from "@core/http/client";
-import { HttpClientConfig, WorkflowExecutionResponse } from "@core/types";
+import { WorkflowExecutionResponse } from "@core/types";
 import { WorkerLoader } from "@core/workers/loader";
-import { MindStudioWorkers } from "@mindstudio/types";
+import { MindStudioWorkers, WorkflowResponse } from "@mindstudio/types";
+import { KeyManager } from "./core/auth/keyManager";
 import { MindStudioError } from "./errors";
-import { WorkflowResponse } from "./types";
 
 export class MindStudio {
   private readonly httpClient: HttpClient;
   private readonly workerLoader: WorkerLoader;
   private _workers?: MindStudioWorkers;
+  private apiKey: string;
 
-  constructor(apiKey: string, config: HttpClientConfig = {}) {
-    this.httpClient = new HttpClient(apiKey, config);
+  constructor(apiKey?: string, options?: { baseUrl?: string }) {
+    this.apiKey = KeyManager.resolveKey(apiKey);
+
+    this.httpClient = new HttpClient(this.apiKey, {
+      baseUrl: options?.baseUrl,
+    });
     this.workerLoader = new WorkerLoader(this.run.bind(this));
     this._workers = this.workerLoader.loadFromConfig();
   }

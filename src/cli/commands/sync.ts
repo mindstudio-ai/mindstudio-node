@@ -7,12 +7,12 @@ import { BaseCommand } from "./base";
 import { WorkerDiscoveryService } from "../services/discovery";
 import { TypeGenerator } from "../services/generator";
 import { Prompts } from "../services/prompts";
+import { KeyManager } from "@core/auth/keyManager";
 
 export class SyncCommand implements BaseCommand {
   constructor(
     private configManager: ConfigManager,
-    private typeGenerator: TypeGenerator,
-    private prompts: Prompts
+    private typeGenerator: TypeGenerator
   ) {}
 
   private convertToWorkerWorkflows(config: Config) {
@@ -64,15 +64,7 @@ export class SyncCommand implements BaseCommand {
     }
 
     try {
-      const apiKey = await this.prompts.getApiKey(options.key);
-      if (!apiKey) {
-        console.error(
-          "\n❌ No API key provided" +
-            "\n   Set MINDSTUDIO_KEY in your environment or .env file" +
-            "\n   Get your key at: https://app.mindstudio.ai/workspace/settings/developer?page=api-keys\n"
-        );
-        return;
-      }
+      const apiKey = KeyManager.resolveKey(options.key);
 
       console.log(
         "\n🚀 " +
