@@ -1,6 +1,6 @@
-import { SyncCommand } from "@cli/commands/sync";
-import { TypeGenerator } from "@cli/services/generator";
-import { ConfigManager } from "@core/config/manager";
+import { SyncCommand } from "../../src/cli/commands/sync";
+import { TypeGenerator } from "../../src/cli/services/generator";
+import { ConfigManager } from "../../src/core/config/manager";
 import fs from "fs";
 import { setupApiMock } from "../__fixtures__/api";
 import { mockConfig } from "../__fixtures__/config";

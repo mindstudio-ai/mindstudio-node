@@ -1,13 +1,11 @@
-import { MindStudio } from "../../client";
-import { ConfigManager } from "@core/config/manager";
-import { SyncOptions } from "../types";
-import { Worker, Workflow } from "@core/types";
-import { Config } from "@core/config/types";
-import { BaseCommand } from "./base";
+import { KeyManager } from "../../core/auth/keyManager";
+import { ConfigManager } from "../../core/config/manager";
+import { Config } from "../../core/config/types";
+import { Worker, Workflow } from "../../core/types";
 import { WorkerDiscoveryService } from "../services/discovery";
 import { TypeGenerator } from "../services/generator";
-import { Prompts } from "../services/prompts";
-import { KeyManager } from "@core/auth/keyManager";
+import { SyncOptions } from "../types";
+import { BaseCommand } from "./base";
 
 export class SyncCommand implements BaseCommand {
   constructor(

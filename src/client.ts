@@ -1,7 +1,7 @@
-import { HttpClient } from "@core/http/client";
-import { WorkflowExecutionResponse } from "@core/types";
-import { WorkerLoader } from "@core/workers/loader";
-import { MindStudioWorkers, WorkflowResponse } from "@mindstudio/types";
+import { HttpClient } from "./core/http/client";
+import { WorkflowExecutionResponse } from "./core/http/types";
+import { WorkerLoader } from "./core/workers/loader";
+import { MindStudioWorkers, WorkflowResponse } from "./types";
 import { KeyManager } from "./core/auth/keyManager";
 import { MindStudioError } from "./errors";
 

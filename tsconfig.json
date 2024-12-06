@@ -14,18 +14,6 @@
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
         "resolveJsonModule": true,
-        "baseUrl": ".",
-        "paths": {
-            "@core/*": [
-                "src/core/*"
-            ],
-            "@mindstudio/*": [
-                "src/*",
-            ],
-            "@cli/*": [
-                "src/cli/*"
-            ]
-        }
     },
     "include": [
         "src/**/*",

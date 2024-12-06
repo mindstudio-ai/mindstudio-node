@@ -1,5 +1,5 @@
-import { ListCommand } from "@cli/commands/list";
-import { ConfigManager } from "@core/config/manager";
+import { ListCommand } from "../../src/cli/commands/list";
+import { ConfigManager } from "../../src/core/config/manager";
 import fs from "fs";
 import { setupApiMock } from "../__fixtures__/api";
 import { mockConfig } from "../__fixtures__/config";

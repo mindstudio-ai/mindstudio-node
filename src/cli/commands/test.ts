@@ -1,9 +1,9 @@
-import { TestOptions } from "@cli/types";
-import { ConfigManager } from "@core/config/manager";
-import { MindStudio } from "@mindstudio/client";
+import { TestOptions } from "../types";
+import { ConfigManager } from "../../core/config/manager";
+import { MindStudio } from "../../client";
 import { Prompts } from "../services/prompts";
 import { BaseCommand } from "./base";
-import { KeyManager } from "@core/auth/keyManager";
+import { KeyManager } from "../../core/auth/keyManager";
 
 export class TestCommand implements BaseCommand {
   constructor(

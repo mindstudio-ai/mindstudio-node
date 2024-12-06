@@ -1,10 +1,10 @@
 import { Command } from "commander";
 
-import { ConfigManager } from "@core/config/manager";
 import { SyncCommand, TestCommand } from "./commands";
 import { TypeGenerator } from "./services/generator";
 import { Prompts } from "./services/prompts";
 import { ListCommand } from "./commands/list";
+import { ConfigManager } from "../core/config/manager";
 
 export class CLI {
   constructor(

@@ -1,9 +1,8 @@
-import { BaseCommand } from "./base";
-import { ConfigManager } from "@core/config/manager";
+import { KeyManager } from "../../core/auth/keyManager";
+import { ConfigManager } from "../../core/config/manager";
 import { WorkerDiscoveryService } from "../services/discovery";
-import { KeyManager } from "@core/auth/keyManager";
 import { Config, ListOptions } from "../types";
-import { MSWorker } from "@core/types";
+import { BaseCommand } from "./base";
 
 export class ListCommand implements BaseCommand {
   constructor(private configManager: ConfigManager) {}

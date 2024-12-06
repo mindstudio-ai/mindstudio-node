@@ -1,5 +1,5 @@
 import * as dotenv from "dotenv";
-import { MindStudioError } from "@mindstudio/errors";
+import { MindStudioError } from "../../errors";
 
 export class KeyManager {
   private static readonly API_KEY_ERROR_MESSAGE =

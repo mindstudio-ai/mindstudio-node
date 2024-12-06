@@ -1,9 +1,11 @@
-import { ConfigManager } from "@core/config/manager";
-import { WorkflowResponse, WorkflowFunction } from "../../types";
-import { MindStudioWorkers } from "@mindstudio/types";
-import { MSWorker, MSWorkflow, MSVariables } from "./types";
-import { Config } from "@core/config/types";
-import { Worker, Workflow } from "@core/types";
+import {
+  WorkflowResponse,
+  MindStudioWorkers,
+  WorkflowFunction,
+} from "../../types";
+import { ConfigManager } from "../config/manager";
+import { Config } from "../config/types";
+import { MSWorker, Workflow, MSWorkflow, MSVariables, Worker } from "./types";
 
 type RunFunction = (params: {
   workerId: string;
