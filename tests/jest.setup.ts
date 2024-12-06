@@ -10,4 +10,11 @@ if (!process.env.MINDSTUDIO_KEY) {
 }
 
 // Global test timeout
-jest.setTimeout(30000);
+jest.setTimeout(5000);
+
+// Add to existing setup
+global.console = {
+  ...console,
+  log: jest.fn(),
+  error: jest.fn(),
+};

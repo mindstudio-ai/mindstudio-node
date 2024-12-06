@@ -10,7 +10,8 @@ export const setupApiMock = () => {
       mock.onPost("/workers/run").reply(200, response);
     },
     mockWorkflowExecutionError: (error: Error) => {
-      mock.onPost("/workers/run").reply(400, { error: error.message });
+      mock.onPost("/workers/run").networkError();
     },
+    getHistory: () => mock.history,
   };
 };

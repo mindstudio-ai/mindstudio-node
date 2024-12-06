@@ -11,7 +11,7 @@ export class TestCommand {
 
   public async execute(options: TestOptions): Promise<void> {
     try {
-      const config = await this.config.load();
+      const config = this.config.load();
       const apiKey = await this.prompts.getApiKey(options.key);
 
       if (!apiKey) {
@@ -35,6 +35,11 @@ export class TestCommand {
         : await this.prompts.getWorkflowInput(config, worker, workflow);
 
       const result = await client.workers[worker][workflow](input);
+
+      if (!result.success) {
+        throw result.error;
+      }
+
       console.log("Result:", JSON.stringify(result, null, 2));
     } catch (error) {
       if (error instanceof SyntaxError) {
