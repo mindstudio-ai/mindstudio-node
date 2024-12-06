@@ -59,21 +59,9 @@ export class TestCommand extends BaseCommand {
       console.log("Result:", JSON.stringify(result, null, 2));
     } catch (error) {
       if (error instanceof SyntaxError) {
-        console.error("\n❌ Invalid JSON input:");
-        if (options.verbose) {
-          console.error(error);
-        } else {
-          console.error(error.message);
-        }
-      } else if (error instanceof Error) {
-        console.error("\n❌ Test failed:");
-        if (options.verbose) {
-          console.error(error);
-        } else {
-          console.error(error.message);
-        }
+        this.logError(error, "Invalid JSON input", options);
       } else {
-        console.error("\n❌ Test failed:", error);
+        this.logError(error, "Test failed", options);
       }
     }
   }

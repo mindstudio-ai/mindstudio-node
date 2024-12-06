@@ -124,12 +124,13 @@ export class SyncCommand extends BaseCommand {
           "\n   • Ready to use in your code\n"
       );
     } catch (error) {
-      console.error(
-        "\n❌ " +
-          (configExists ? "Sync" : "Initialization") +
-          " failed:" +
-          `\n   ${error instanceof Error ? error.message : String(error)}` +
-          "\n\n   Note: This won't affect your application runtime." +
+      this.logError(
+        error,
+        `${configExists ? "Sync" : "Initialization"} failed`,
+        options
+      );
+      console.warn(
+        "\n   Note: This won't affect your application runtime." +
           "\n   You can try again later with: npx mindstudio sync\n"
       );
     }

@@ -36,13 +36,8 @@ export class ListCommand extends BaseCommand {
 
       this.displayWorkers(workers);
     } catch (error) {
-      console.error("\n❌ Failed to list workers:");
-      if (options.verbose) {
-        console.error(error);
-      } else {
-        console.error(error instanceof Error ? error.message : String(error));
-      }
-      console.error(
+      this.logError(error, "Failed to list workers", options);
+      console.warn(
         "\n   Note: Run 'npx mindstudio sync' first to fetch worker definitions\n"
       );
     }
