@@ -22,7 +22,7 @@ export class CLI {
     this.program.name("mindstudio").description("MindStudio CLI");
 
     if (!this.program.opts().version) {
-      this.program.version(require("../../package.json").version);
+      this.program.version(require("../../../package.json").version);
     }
 
     this.program
