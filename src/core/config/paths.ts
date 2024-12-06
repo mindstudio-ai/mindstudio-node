@@ -7,32 +7,23 @@ export class ConfigPaths {
 
   static getTypesPath(): string {
     try {
-      // Try multiple resolution strategies
-      let packageDir: string | null = null;
+      // Try to resolve the main entry point using require
+      const mainModule = require.resolve("mindstudio");
+      const projectRoot = process.cwd();
+      const packageDir = path.dirname(path.dirname(path.dirname(mainModule))); // Go up two levels from dist/src/index.js
 
-      try {
-        // Try resolving the main entry point
-        const mainPath = require.resolve("mindstudio");
-        packageDir = path.dirname(path.dirname(mainPath)); // Go up two levels from dist/index.js
-      } catch {
-        try {
-          // Fallback: try direct node_modules path
-          const directPath = path.join(
-            process.cwd(),
-            "node_modules",
-            "mindstudio"
-          );
-          if (require.resolve(directPath)) {
-            packageDir = directPath;
-          }
-        } catch {}
-      }
+      // If we're running from a project that has mindstudio as dependency
+      // (not running from within mindstudio package itself)
 
-      // If we found the package and we're not in it
-      if (packageDir && !process.cwd().includes(packageDir)) {
+      if (!projectRoot.includes(packageDir)) {
         return path.join(packageDir, "dist/src/generated");
       }
-    } catch {}
+    } catch {
+      // Either:
+      // 1. We're in development
+      // 2. Resolution failed
+      // 3. We're in tests (where require.resolve might be mocked)
+    }
 
     // Default to local development path
     return path.join(process.cwd(), "dist/src/generated");
