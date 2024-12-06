@@ -5,7 +5,7 @@ export * from "./http/types";
 declare global {
   namespace NodeJS {
     interface ProcessEnv {
-      MINDSTUDIO_KEY: string;
+      MINDSTUDIO_KEY?: string;
     }
   }
 }

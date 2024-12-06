@@ -1,7 +1,7 @@
-import { MindStudio } from "../../client/client";
+import { TestOptions } from "@cli/types";
 import { ConfigManager } from "../config";
 import { Prompts } from "../prompts";
-import { TestOptions } from "@internal/types";
+import { MindStudio } from "@public/client";
 
 export class TestCommand {
   constructor(

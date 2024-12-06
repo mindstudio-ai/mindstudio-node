@@ -12,22 +12,26 @@ export class ConfigManager {
   writeTypes(types: string): void {
     try {
       // Try development path first
-      const devTypesDir = path.join(__dirname, "../../dist");
+      const devTypesDir = path.join(__dirname, "../../dist/src/generated");
       fs.mkdirSync(devTypesDir, { recursive: true });
-      fs.writeFileSync(path.join(devTypesDir, "generated.d.ts"), types);
+      fs.writeFileSync(path.join(devTypesDir, "workers.d.ts"), types);
     } catch (error) {
       try {
         // Fall back to installed package path
         const packageDir = path.dirname(
           require.resolve("mindstudio/package.json")
         );
-        const typesPath = path.join(packageDir, "dist", "generated.d.ts");
+        const typesPath = path.join(
+          packageDir,
+          "dist/src/generated",
+          "workers.d.ts"
+        );
         fs.writeFileSync(typesPath, types);
       } catch (secondError) {
         // Final fallback to local node_modules
         const localPath = path.join(
           process.cwd(),
-          "node_modules/mindstudio/dist/generated.d.ts"
+          "node_modules/mindstudio/dist/src/generated/workers.d.ts"
         );
         fs.mkdirSync(path.dirname(localPath), { recursive: true });
         fs.writeFileSync(localPath, types);
