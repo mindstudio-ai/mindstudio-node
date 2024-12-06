@@ -28,11 +28,7 @@ export class CLI {
       .option("--base-url <url>", "Override API base URL")
       .option("--key <apiKey>", "Override API key");
 
-    const syncCmd = new SyncCommand(
-      this.configManager,
-      this.typeGenerator,
-      this.prompts
-    );
+    const syncCmd = new SyncCommand(this.configManager, this.typeGenerator);
     const testCmd = new TestCommand(this.configManager, this.prompts);
 
     this.program

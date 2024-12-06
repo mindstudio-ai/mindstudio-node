@@ -1,9 +1,6 @@
-export interface WorkflowResponse<T = any> {
-  success: boolean;
-  result?: T;
-  error?: Error;
-  billingCost?: string;
-}
+export type WorkflowResponse<T> =
+  | { success: true; result: T; billingCost?: string }
+  | { success: false; error: Error };
 
 export interface WorkflowFunction<TInput = any, TOutput = any> {
   (variables?: TInput): Promise<WorkflowResponse<TOutput>>;

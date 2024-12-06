@@ -3,6 +3,7 @@ import { ConfigManager } from "@core/config/manager";
 import { MindStudio } from "@mindstudio/client";
 import { Prompts } from "../services/prompts";
 import { BaseCommand } from "./base";
+import { KeyManager } from "@core/auth/keyManager";
 
 export class TestCommand implements BaseCommand {
   constructor(
@@ -13,18 +14,9 @@ export class TestCommand implements BaseCommand {
   public async execute(options: TestOptions): Promise<void> {
     try {
       const config = this.config.readConfig();
-      const apiKey = await this.prompts.getApiKey(options.key);
+      const apiKey = KeyManager.resolveKey(options.key);
 
-      if (!apiKey) {
-        console.error(
-          "No API key provided. Set MINDSTUDIO_KEY in your environment or .env file"
-        );
-        return;
-      }
-
-      const client = new MindStudio(apiKey, {
-        baseUrl: options.baseUrl,
-      });
+      const client = new MindStudio(apiKey);
 
       const { worker, workflow } =
         options.worker && options.workflow
