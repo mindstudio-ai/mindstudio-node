@@ -1,11 +1,5 @@
 import { Workflow, Worker } from "../../src/core/types";
 
-const workerData = {
-  id: "test-worker-id",
-  name: "Test Worker",
-  slug: "test-worker",
-};
-
 export const mockConfig = {
   version: "1.0.0",
   workers: [
