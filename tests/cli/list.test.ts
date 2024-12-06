@@ -11,6 +11,11 @@ describe("List Command", () => {
   const apiMock = setupApiMock();
 
   beforeEach(() => {
+    // Clean up any existing files first
+    if (fs.existsSync(CONFIG_PATH)) {
+      fs.unlinkSync(CONFIG_PATH);
+    }
+
     // Save original env
     originalEnv = { ...process.env };
 
@@ -40,6 +45,9 @@ describe("List Command", () => {
         ],
       },
     ]);
+
+    // Clear all console mocks
+    jest.clearAllMocks();
   });
 
   afterEach(() => {
@@ -51,8 +59,9 @@ describe("List Command", () => {
       fs.unlinkSync(CONFIG_PATH);
     }
 
-    // Clear console mocks
+    // Clear all mocks
     jest.clearAllMocks();
+    apiMock.reset();
   });
 
   describe("Configuration Based Listing", () => {
