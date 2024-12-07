@@ -49,22 +49,14 @@ ${workerFunctions.join("\n")}
   }
 
   private generateInputType(variables: string[]): string {
-    const resolvedVariables = variables
-      .filter((v) => v)
-      .map((v) => v.replace(/[\W]+/g, ''));
-
-    return resolvedVariables.length > 0
-      ? `{ ${resolvedVariables.map((v) => `${v}: string`).join("; ")} }`
+    return variables.length > 0
+      ? `{ ${variables.map((v) => `${v}: string`).join("; ")} }`
       : "void";
   }
 
   private generateOutputType(variables: string[]): string {
-    const resolvedVariables = variables
-      .filter((v) => v)
-      .map((v) => v.replace(/[\W]+/g, ''));
-
-    return resolvedVariables.length > 0
-      ? `{\n    ${resolvedVariables.map((v) => `${v}: string`).join(";\n    ")}\n  }`
+    return variables.length > 0
+      ? `{\n    ${variables.map((v) => `${v}: string`).join(";\n    ")}\n  }`
       : "string | undefined";
   }
 
