@@ -31,8 +31,8 @@ export class WorkerDiscoveryService {
                     wf.id,
                     wf.name,
                     wf.slug,
-                    wf.launchVariables.filter((v) => v),
-                    wf.outputVariables.filter((v) => v),
+                    wf.launchVariables.map((v) => (v || '').replace(/[\W]+/g, '')).filter((v) => v),
+                    wf.outputVariables.map((v) => (v || '').replace(/[\W]+/g, '')).filter((v) => v),
                     workerData
                   )
               )
