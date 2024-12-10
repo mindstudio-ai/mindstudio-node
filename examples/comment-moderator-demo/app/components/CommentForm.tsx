@@ -1,35 +1,12 @@
 "use client";
 
-import { useState } from "react";
-
 interface CommentFormProps {
-  onSubmit: (content: string) => Promise<void>;
+  submitComment: (formData: FormData) => void;
 }
 
-export default function CommentForm({ onSubmit }: CommentFormProps) {
-  const [content, setContent] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!content.trim()) return;
-
-    setIsSubmitting(true);
-    setError(null);
-    try {
-      await onSubmit(content);
-      setContent("");
-    } catch (err) {
-      setError("Failed to submit comment. Please try again.");
-      console.error(err);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
+export default function CommentForm({ submitComment }: CommentFormProps) {
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form action={submitComment}>
       <div>
         <label
           htmlFor="comment"
@@ -39,21 +16,18 @@ export default function CommentForm({ onSubmit }: CommentFormProps) {
         </label>
         <textarea
           id="comment"
+          name="content"
           rows={3}
+          required
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          disabled={isSubmitting}
         />
       </div>
       <button
         type="submit"
-        disabled={isSubmitting}
-        className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50"
+        className="inline-flex justify-center rounded-md bg-indigo-600 py-2 px-4 mt-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
       >
-        {isSubmitting ? "Submitting..." : "Submit"}
+        Submit
       </button>
-      {error && <p className="text-red-600">{error}</p>}
     </form>
   );
 }

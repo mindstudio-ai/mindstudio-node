@@ -1,3 +1,5 @@
+"use client";
+
 import { Comment } from "@/types";
 
 interface CommentListProps {
@@ -27,22 +29,21 @@ export default function CommentList({ comments }: CommentListProps) {
             </span>
           </div>
           <p className="mt-2 text-sm text-gray-700">{comment.content}</p>
-          {comment.moderationResult && (
+          {comment.isModerated ? (
             <div className="mt-2 text-xs">
               <span
                 className={
-                  comment.moderationResult.isApproved
+                  comment.moderationResult?.isApproved
                     ? "text-green-600"
                     : "text-red-600"
                 }
               >
-                {comment.moderationResult.isApproved ? "Approved" : "Rejected"}
-                {comment.moderationResult.reason &&
+                {comment.moderationResult?.isApproved ? "Approved" : "Rejected"}
+                {comment.moderationResult?.reason &&
                   `: ${comment.moderationResult.reason}`}
               </span>
             </div>
-          )}
-          {!comment.isModerated && (
+          ) : (
             <p className="text-yellow-600 mt-2">Moderation pending...</p>
           )}
         </div>
