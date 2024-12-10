@@ -1,4 +1,4 @@
-import { Comment } from "@types";
+import { Comment } from "@/types";
 
 interface CommentListProps {
   comments: Comment[];
@@ -11,11 +11,11 @@ export default function CommentList({ comments }: CommentListProps) {
         <div
           key={comment.id}
           className={`p-4 rounded-lg border ${
-            comment.moderationResult?.isApproved
-              ? "border-green-200 bg-green-50"
-              : comment.moderationResult
-                ? "border-red-200 bg-red-50"
-                : "border-gray-200 bg-gray-50"
+            comment.isModerated
+              ? comment.moderationResult?.isApproved
+                ? "border-green-200 bg-green-50"
+                : "border-red-200 bg-red-50"
+              : "border-yellow-200 bg-yellow-50"
           }`}
         >
           <div className="flex justify-between items-start">
@@ -41,6 +41,9 @@ export default function CommentList({ comments }: CommentListProps) {
                   `: ${comment.moderationResult.reason}`}
               </span>
             </div>
+          )}
+          {!comment.isModerated && (
+            <p className="text-yellow-600 mt-2">Moderation pending...</p>
           )}
         </div>
       ))}

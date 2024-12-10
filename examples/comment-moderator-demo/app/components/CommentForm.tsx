@@ -9,15 +9,20 @@ interface CommentFormProps {
 export default function CommentForm({ onSubmit }: CommentFormProps) {
   const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!content.trim()) return;
 
     setIsSubmitting(true);
+    setError(null);
     try {
       await onSubmit(content);
       setContent("");
+    } catch (err) {
+      setError("Failed to submit comment. Please try again.");
+      console.error(err);
     } finally {
       setIsSubmitting(false);
     }
@@ -48,6 +53,7 @@ export default function CommentForm({ onSubmit }: CommentFormProps) {
       >
         {isSubmitting ? "Submitting..." : "Submit"}
       </button>
+      {error && <p className="text-red-600">{error}</p>}
     </form>
   );
 }

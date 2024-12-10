@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
-import { Comment } from "@/app/types";
+import { Comment } from "@/types";
+import { MindStudio } from "mindstudio";
 
 // In a real app, this would be a database
 const comments: Comment[] = [];
+
+const mindstudio = new MindStudio(process.env.MINDSTUDIO_KEY);
 
 export async function GET() {
   return NextResponse.json(comments);
@@ -25,19 +28,16 @@ export async function POST(request: Request) {
   // In a real app, we would trigger moderation here
   // For now, we'll do it inline
   try {
-    const moderationResponse = await fetch("/api/comments/moderate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ content: newComment.content }),
-    });
+    const moderationResult =
+      await mindstudio.workers.MindStudioServices.contentModerator({
+        content: newComment.content,
+      });
 
-    if (moderationResponse.ok) {
-      const result = await moderationResponse.json();
-      newComment.moderationResult = result;
-      newComment.isModerated = true;
-    }
+    newComment.moderationResult = {
+      isApproved: moderationResult.result === "CLEAR",
+      reason: moderationResult.result,
+    };
+    newComment.isModerated = true;
   } catch (error) {
     console.error("Moderation failed:", error);
   }

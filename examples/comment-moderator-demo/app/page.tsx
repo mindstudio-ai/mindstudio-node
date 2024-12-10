@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import CommentForm from "./components/CommentForm";
 import CommentList from "./components/CommentList";
-import { Comment } from "./types";
+import { Comment } from "../types";
 
 export default function Home() {
   const [comments, setComments] = useState<Comment[]>([]);
