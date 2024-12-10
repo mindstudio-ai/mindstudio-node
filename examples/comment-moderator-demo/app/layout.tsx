@@ -1,6 +1,8 @@
+import "./globals.css";
+
 export const metadata = {
-  title: "Comment Moderator Demo",
-  description: "A simple comment moderation demo using MindStudio and Next.js",
+  title: "MindStudio Comment Moderator",
+  description: "A simple demo of MindStudio content moderation",
 };
 
 export default function RootLayout({
@@ -9,8 +11,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="en" className="h-full bg-gray-50">
+      <body className="h-full">
+        <main className="min-h-full">{children}</main>
+      </body>
     </html>
   );
 }
