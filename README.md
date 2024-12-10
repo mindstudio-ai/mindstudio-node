@@ -53,7 +53,7 @@ npm install mindstudio
    try {
      const client = new MindStudio(process.env.MINDSTUDIO_KEY);
      const { result, billingCost } = await client.run({
-       workerId: "your-worker-id",  // Get this from 'npx mindstudio list'
+       workerId: "your-worker-id",   // Get this from 'npx mindstudio list'
        workflow: "generateText",     // Get this from 'npx mindstudio list'
        variables: {
          prompt: "Write a story about a space cat"
@@ -77,8 +77,9 @@ All workflow executions return a consistent response type:
 
 ```typescript
 interface WorkflowResponse<T> {
-  result: T;          // The workflow execution result
-  billingCost?: string // Execution cost in credits (optional)
+  result: T;            // The workflow execution result
+  threadId: string;     // The ID of the response object
+  billingCost?: string; // Execution cost in credits (optional)
 }
 ```
 

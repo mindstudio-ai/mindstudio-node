@@ -2,6 +2,7 @@ import {
   WorkflowResponse,
   MindStudioWorkers,
   WorkflowFunction,
+  WorkflowRunOptions,
 } from "../../types";
 import { ConfigManager } from "../config/manager";
 import { Config } from "../config/types";
@@ -12,6 +13,7 @@ type RunFunction = (params: {
   workerId: string;
   workflow: string;
   variables?: Record<string, string>;
+  callbackUrl?: string;
 }) => Promise<WorkflowResponse<any>>;
 
 export class WorkerLoader {
@@ -69,11 +71,12 @@ export class WorkerLoader {
     worker: MSWorker,
     workflow: MSWorkflow
   ): WorkflowFunction {
-    const fn = async (variables?: MSVariables) => {
+    const fn = async (variables?: MSVariables, options?: WorkflowRunOptions) => {
       return this.runFn({
         workerId: worker.id,
         workflow: workflow.name,
         variables: variables || {},
+        ...options,
       });
     };
 

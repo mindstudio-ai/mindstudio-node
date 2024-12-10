@@ -1,10 +1,15 @@
 export interface WorkflowResponse<T> {
   result: T;
+  threadId: string;
   billingCost?: string;
 }
 
+export interface WorkflowRunOptions {
+  callbackUrl?: string;
+}
+
 export interface WorkflowFunction<TInput = any, TOutput = any> {
-  (variables?: TInput): Promise<WorkflowResponse<TOutput>>;
+  (variables?: TInput, options?: WorkflowRunOptions): Promise<WorkflowResponse<TOutput>>;
   __info?: {
     id: string;
     name: string;
