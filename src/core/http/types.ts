@@ -4,5 +4,6 @@ export interface HttpClientConfig {
 
 export interface WorkflowExecutionResponse {
   result: any;
+  threadId: string;
   billingCost: string;
 }

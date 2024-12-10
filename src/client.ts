@@ -42,6 +42,7 @@ export class MindStudio {
     workerId: string;
     workflow?: string;
     variables?: Record<string, string>;
+    callbackUrl?: string;
   }): Promise<WorkflowResponse<any>> {
     try {
       const response = await this.httpClient.post<WorkflowExecutionResponse>(
@@ -50,10 +51,12 @@ export class MindStudio {
           workerId: params.workerId,
           workflow: params.workflow,
           variables: params.variables || {},
+          callbackUrl: params.callbackUrl,
         }
       );
 
       return {
+        threadId: response.threadId,
         result: response.result,
         billingCost: response.billingCost,
       };
