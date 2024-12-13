@@ -294,6 +294,39 @@ try {
 
 ---
 
+## 📚 Examples
+
+This repository includes example implementations as Git submodules under the `examples/` directory. To get started with the examples:
+
+1. **Clone the repository with examples:**
+
+```bash
+git clone --recurse-submodules https://github.com/mindstudio-ai/mindstudio-node.git
+```
+
+2. **Or if you've already cloned the repository:**
+
+```bash
+git submodule init
+git submodule update
+```
+
+Each example is maintained in its own repository for clarity and simplicity:
+
+- `examples/mindstudio-nextjs-sample`: Next.js application examples
+
+To explore a specific example:
+
+```bash
+cd examples/mindstudio-nextjs-sample
+npm install
+npm run start
+```
+
+Visit each example's README for detailed implementation instructions and explanations.
+
+---
+
 ## License
 
 MIT
