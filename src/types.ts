@@ -6,6 +6,7 @@ export interface WorkflowResponse<T> {
 
 export interface WorkflowRunOptions {
   callbackUrl?: string;
+  progressUrl?: string;
 }
 
 export interface WorkflowFunction<TInput = any, TOutput = any> {
