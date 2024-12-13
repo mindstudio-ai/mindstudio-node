@@ -1,0 +1,3 @@
+[submodule "examples/mindstudio-nextjs-sample"]
+	path = examples/mindstudio-nextjs-sample
+	url = https://github.com/mindstudio-ai/mindstudio-nextjs-sample
