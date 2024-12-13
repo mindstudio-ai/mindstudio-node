@@ -26,7 +26,6 @@ export class EntityFormatter {
 
     // Remove illegal characters (keeping only letters, numbers, spaces, hyphens, and underscores)
     const cleanName = name
-      .replace(/^[0-9]+/, "") // Remove numbers only if they're at the very beginning
       .replace(/^_+/, "") // temporarily remove leading underscores
       .replace(/[^\w\s-]/g, ""); // remove all other illegal characters
 
@@ -47,6 +46,6 @@ export class EntityFormatter {
             : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
         )
         .join("")
-    );
+    ).replace(/^[0-9]+/, "");
   }
 }
