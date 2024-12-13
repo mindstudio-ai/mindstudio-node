@@ -14,6 +14,7 @@ type RunFunction = (params: {
   workflow: string;
   variables?: Record<string, string>;
   callbackUrl?: string;
+  progressUrl?: string;
 }) => Promise<WorkflowResponse<any>>;
 
 export class WorkerLoader {
