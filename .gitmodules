@@ -1,3 +1,9 @@
 [submodule "examples/mindstudio-nextjs-sample"]
 	path = examples/mindstudio-nextjs-sample
 	url = https://github.com/mindstudio-ai/mindstudio-nextjs-sample
+[submodule "examples/mindstudio-discord-bot-scaffold"]
+	path = examples/mindstudio-discord-bot-scaffold
+	url = https://github.com/markof94/mindstudio-discord-bot-scaffold.git
+[submodule "examples/mindstudio-slack-bot-scaffold"]
+	path = examples/mindstudio-slack-bot-scaffold
+	url = https://github.com/markof94/mindstudio-slack-bot-scaffold
